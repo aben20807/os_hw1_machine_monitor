@@ -1,0 +1,38 @@
+#!/bin/bash
+
+ASTYLE_OPTS="--style=linux --indent=tab --max-code-length=80 "
+
+
+RETURN=0
+ASTYLE=$(which astyle)
+if [ $? -ne 0 ]; then
+    echo "[!] astyle not installed. Unable to check source file format policy." >&2
+    exit 1
+fi
+
+
+FILES=`git diff --cached --name-only --diff-filter=ACMR | grep -E "\.(c|cpp|h)$"`
+for FILE in $FILES; do
+    nf=`git checkout-index --temp $FILE | awk '{ print $1 }'`
+    newfile=`mktemp /tmp/tmp_${nf}.XXXXXX` || exit 1
+    $ASTYLE $ASTYLE_OPTS < $nf > $newfile 2>> /dev/null
+    diff -u -p -B  "${nf}" "${newfile}"
+    r=$?
+    rm "${newfile}"
+    rm "${nf}"
+    if [ $r != 0 ] ; then
+        echo "[!] $FILE does not follow the consistent coding style." >&2
+        RETURN=1
+    fi
+done
+
+if [ $RETURN -eq 1 ]; then
+    echo "" >&2
+    echo "Make sure you have run astyle as the following:" >&2
+    echo "    astyle $ASTYLE_OPTS --suffix=none $FILE" >&2
+    echo
+fi
+
+
+
+exit $RETURN
