@@ -3,6 +3,6 @@
 
 #include "protocol.h"
 
-void open_file(FILE **fin, const char *fileName);
+FILE* open_file(const char *fileName);
 
 #endif

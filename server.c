@@ -2,15 +2,19 @@
 
 int main(int argc, char **argv)
 {
-	FILE *f;
-	open_file(&f, "t.c");
+	FILE *fin;
+	fin = open_file("t.c");
+	fclose(fin);
 	return 0;
 }
 
-void open_file(FILE **fin, const char *fileName)
+FILE* open_file(const char *fileName)
 {
-	if (!(*fin = fopen(fileName, "r"))) {
+	FILE *fin;
+	if (!(fin = fopen(fileName, "r"))) {
 		printf("No file!\n");
 		exit(1);
+	} else {
+		return fin;
 	}
 }
