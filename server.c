@@ -5,11 +5,16 @@ int main(int argc, char **argv)
 	FILE *fin;
 	fin = open_file("t.c");
 	fclose(fin);
-	char *c = create_status_path(1);
-	printf("%s\n", c);
-	fin = open_file(create_status_path(1));
+	pid_t pid = 1;
+	fin = open_file(create_status_path(pid));
+	char line_buffer[BUFSIZ]; /* BUFSIZ is defined if you include stdio.h */
+	int line_number = 0;
+	while (fgets(line_buffer, sizeof(line_buffer), fin)) {
+		printf("%4d: %s", line_number, line_buffer);
+		line_number++;
+	}
 	fclose(fin);
-	printf("exit");
+	printf("\nexit\n");
 	return 0;
 }
 
