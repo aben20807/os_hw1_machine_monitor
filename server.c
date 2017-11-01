@@ -3,29 +3,34 @@
 int main(int argc, char **argv)
 {
 	FILE *fin;
-	fin = open_file("t.c");
+	open_file(&fin, "t.c");
 	fclose(fin);
-	pid_t pid = 1;
-	fin = open_file(create_status_path(pid));
-	char line_buffer[BUFSIZ]; /* BUFSIZ is defined if you include stdio.h */
-	int line_number = 0;
-	while (fgets(line_buffer, sizeof(line_buffer), fin)) {
-		printf("%4d: %s", line_number, line_buffer);
-		line_number++;
+	for (int i = 0; i < 10; i++) {
+		pid_t pid = i;
+		if (!open_file(&fin, create_status_path(pid))) {
+			continue;
+		}
+		printf("\npid: %d\n", i);
+		char line_buffer[BUFSIZ]; // BUFSIZ is defined in stdio.h
+		int line_number = 0;
+		while (fgets(line_buffer, sizeof(line_buffer), fin)) {
+			printf("%4d: %s", line_number, line_buffer);
+			line_number++;
+		}
+		printf("line: %d\n", line_number);
+		fclose(fin);
 	}
-	fclose(fin);
 	printf("\nexit\n");
 	return 0;
 }
 
-FILE* open_file(const char *fileName)
+int open_file(FILE **fin, const char *file_name)
 {
-	FILE *fin;
-	if (!(fin = fopen(fileName, "r"))) {
-		printf("No file!\n");
-		exit(1);
+	if (!(*fin = fopen(file_name, "r"))) {
+		printf("No file: %s\n", file_name);
+		return 0;
 	} else {
-		return fin;
+		return 1;
 	}
 }
 
