@@ -46,7 +46,6 @@ map create_status_map(FILE *fin, const pid_t pid)
 	char line_buffer[BUFSIZ]; // BUFSIZ is defined in stdio.h
 	int line_number = 0;
 	while (fgets(line_buffer, sizeof(line_buffer), fin)) {
-
 		// printf("%4d: %s", line_number, line_buffer);
 		line_number++;
 	}
@@ -61,35 +60,16 @@ void split_key_value(char *line, char **key, char **value)
 	*value = (char *) malloc(sizeof(char) * 20);
 	bool is_colon_appear = false;
 	int count = 0;
-	// printf("%d\n", strlen(*key));
-	// key[3] = '0';
-	// *value[0] = '0';
 	for (int i = 0; i < strlen(line); i++) {
-		// printf("%d: \n", i);
 		if (line[i] == ':') {
 			is_colon_appear = true;
 		} else if (!is_colon_appear) {
-			// printf("%c\n", line[i]);
-			// strcat(*key, line[i]);
 			(*key)[i] = line[i];
-			// printf("key: %c\n", *key[i]);
 		} else {
-			if (line[i] == ' ') {
+			if (line[i] == ' ') { // ignore white space
 				continue;
 			}
-			// printf("%c\n", line[i]);
-			// printf("ic: %d %d\n", i, count);
-			// count++;
 			(*value)[count++] = line[i];
 		}
 	}
-	// printf("%d\n", strlen(key));
-	// key[strlen(key)] = '\0';
-	// strcat(*key,"\0");
-	// printf("%d\n", strlen(value));
-	// value[strlen(value)] = '\0';
-	// strcat(value,"\0");
-	// for (int i = 0; i < strlen(key); i++) {
-	//     printf("%d %c\n", i, key[i]);
-	// }
 }

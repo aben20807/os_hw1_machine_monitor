@@ -14,8 +14,6 @@ struct Element {
 int open_file(FILE** fin, const char* fileName);
 char* create_status_path(const pid_t pid);
 map create_status_map(FILE *fin, const pid_t pid);
-// void get_info_key(char *line, char *key, char *value);
-// void split_key_value(char *line, char *key, char *value);
 void split_key_value(char *line, char **key, char **value);
 
 #endif
