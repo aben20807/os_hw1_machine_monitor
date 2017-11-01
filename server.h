@@ -3,8 +3,16 @@
 
 #include "protocol.h"
 
-// FILE* open_file(const char *fileName);
+typedef struct Element *element_ptr;
+typedef element_ptr map;
+struct Element {
+	char *key;
+	char *value;
+	element_ptr next;
+};
+
 int open_file(FILE** fin, const char* fileName);
 char* create_status_path(const pid_t pid);
+map create_status_map(const FILE *f);
 
 #endif

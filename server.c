@@ -1,13 +1,5 @@
 #include "server.h"
 
-typedef struct element *element_ptr;
-typedef struct element_ptr status_map;
-struct {
-	char *key;
-	char *value;
-	element_ptr next;
-} element;
-
 int main(int argc, char **argv)
 {
 	FILE *fin;
@@ -45,4 +37,11 @@ char *create_status_path(const pid_t pid)
 	char *path = (char *) malloc(sizeof(char) * 40);
 	snprintf(path, 40, "/proc/%d/status", pid);
 	return path;
+}
+
+map create_status_map(const FILE *f)
+{
+	map status_map = NULL;
+	MALLOC(status_map, sizeof(status_map));
+	return status_map;
 }
