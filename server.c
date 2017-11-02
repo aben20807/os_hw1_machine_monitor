@@ -2,29 +2,34 @@
 
 int main(int argc, char **argv)
 {
-	FILE *fin;
-	for (int i = 0; i < 1; i++) {
-		pid_t pid = i;
-		printf("\npid: %d\n", pid);
-		if (!open_file(&fin, create_status_path(pid))) {
-			continue;
-		}
-		map status_map = create_status_map(fin);
-		element_ptr curr_ptr = status_map;
-		while (curr_ptr != NULL) {
-			// printf("%s:\t",  curr_ptr -> key);
-			// printf("%s\n",  curr_ptr -> value);
-			// // element_ptr tmp = curr_ptr;
-			curr_ptr = curr_ptr -> next;
-			// free(tmp);
-		}
-		printf("%s\n", search_value(status_map, "PPid"));
-		printf("%s\n", search_value(status_map, "State"));
-		delete_map(status_map);
+	//socket的建立
+	char input_buffer[256] = {};
+	char message[] = {"Hi,this is server.\n"};
+	int sockfd = 0, for_client_sockfd = 0;
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (sockfd == -1) {
+		printf("Fail to create a socket.");
+	} else {
+		printf("Server started...\n");
 	}
-	pid_t *p = scan_all_processes();
-	for (int i = 0; i < 4; i++) {
-		printf("[%d]", p[i]);
+	fflush(stdout);
+	//socket的連線
+	struct sockaddr_in server_info, client_info;
+	socklen_t addrlen = sizeof(client_info);
+	memset(&server_info, 0, sizeof(server_info));
+
+	server_info.sin_family = PF_INET;
+	server_info.sin_addr.s_addr = INADDR_ANY;
+	server_info.sin_port = htons(59487);
+	bind(sockfd, (struct sockaddr *)&server_info, sizeof(server_info));
+	listen(sockfd, 5);
+
+	while (1) {
+		for_client_sockfd = accept(sockfd, (struct sockaddr*) &client_info, &addrlen);
+		send(for_client_sockfd, message, sizeof(message), 0);
+		recv(for_client_sockfd, input_buffer, sizeof(input_buffer), 0);
+		printf("Get:%s\n", input_buffer);
 	}
 	printf("\nexit\n");
 	return 0;
@@ -120,7 +125,6 @@ char* search_value(const map status_map, const char* key)
 	return "ERROR: NOT_FOUND";
 }
 
-
 pid_t *scan_all_processes()
 {
 	DIR *proc = opendir("/proc");
@@ -138,7 +142,6 @@ pid_t *scan_all_processes()
 		}
 		pid = strtol(entry -> d_name, NULL, 10);
 		pid_array[array_count++] = pid;
-		printf("%d, ", pid);
 	}
 	closedir(proc);
 	return pid_array;

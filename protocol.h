@@ -7,7 +7,11 @@
 #include <stdbool.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <unistd.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define MALLOC(p, s) \
         if(!((p) = malloc(s))){ \
