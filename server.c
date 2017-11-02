@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 		}
 		printf("%s\n", search_value(status_map, "PPid"));
 		printf("%s\n", search_value(status_map, "State"));
+		delete_map(status_map);
 	}
 	printf("\nexit\n");
 	return 0;
@@ -65,6 +66,18 @@ map create_status_map(FILE *fin)
 	}
 	fclose(fin);
 	return status_map;
+}
+
+void delete_map(const map m)
+{
+	element_ptr curr_ptr = m;
+	while (curr_ptr != NULL) {
+		element_ptr tmp = curr_ptr;
+		curr_ptr = curr_ptr -> next;
+		free(tmp -> key);
+		free(tmp -> value);
+		free(tmp);
+	}
 }
 
 void split_key_value(const char *line, char **key, char **value)
