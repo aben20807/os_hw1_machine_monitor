@@ -19,8 +19,8 @@ $(GIT_HOOKS):
 	@echo
 
 target:
-	$(CC) -o $(SERVER) $(CCFLAGS) $(OPTIMIZE) $(TARGET_SERVER)
-	$(CC) -o $(CLIENT) $(CCFLAGS) $(OPTIMIZE) $(TARGET_CLIENT)
+	$(CC) -o $(SERVER) $(CCFLAGS) $(OPTIMIZE) $(TARGET_SERVER) -lpthread
+	$(CC) -o $(CLIENT) $(CCFLAGS) $(OPTIMIZE) $(TARGET_CLIENT) -lpthread
 
 debug:
 	$(CC) -o $(SERVER) $(CCFLAGS) -g $(TARGET_SERVER)
