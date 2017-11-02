@@ -20,5 +20,6 @@ char *search_value(const map status_map, const char* key);
 pid_t *scan_all_processes();
 int create_server(const int port);
 void accept_client(const int sockfd);
+void *connection_handler(void *sockfd);
 
 #endif

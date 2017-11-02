@@ -146,10 +146,40 @@ void accept_client(const int sockfd)
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
 	socklen_t addrlen = sizeof(client_info);
-	while (true) {
+	while ((1)) {
 		client_sockfd = accept(sockfd, (struct sockaddr*) &client_info, &addrlen);
+		printf("Accepted one\n");
 		send(client_sockfd, message, sizeof(message), 0);
 		recv(client_sockfd, input_buffer, sizeof(input_buffer), 0);
 		printf("Get:%s\n", input_buffer);
+		pthread_t thread_id;
+		if (pthread_create(&thread_id, NULL, connection_handler,
+		                   (void*)&client_sockfd) < 0) {
+			perror("could not create thread");
+		}
+		printf("Handler assigned\n");
+		fflush(stdout);
 	}
+}
+
+void *connection_handler(void *sockfd)
+{
+	int sock = *(int*)sockfd;
+	int read_size;
+	// char input_buffer[2000];
+	char input_buffer[256] = {};
+	while ((read_size = recv(sock, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
+		input_buffer[read_size] = '\0';
+		printf("Get:%s\n", input_buffer);
+		fflush(stdout);
+		// write(sock, input_buffer, strlen(input_buffer));
+		memset(input_buffer, 0, sizeof(input_buffer));
+	}
+	if (read_size == 0) {
+		printf("Client disconnected");
+		fflush(stdout);
+	} else if (read_size == -1) {
+		perror("recv failed");
+	}
+	return 0;
 }

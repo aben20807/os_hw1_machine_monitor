@@ -5,10 +5,17 @@ int main(int argc, char **argv)
 	int sockfd = create_client();
 	connect_to_server(sockfd, "127.0.0.1", 59487);
 	char message[] = {"Hi there"};
-	char receive_message[100] = {};
-	send(sockfd, message, sizeof(message), 0);
-	recv(sockfd, receive_message, sizeof(receive_message), 0);
-	printf("%s", receive_message);
+	// char receive_message[100] = {};
+	while (1) {
+		char c;
+		scanf("%c", &c);
+		sprintf(message, "%c", c);
+		printf("%s", message);
+		fflush(stdout);
+		send(sockfd, message, sizeof(message), 0);
+		// recv(sockfd, receive_message, sizeof(receive_message), 0);
+		// printf("%s", receive_message);
+	}
 	printf("close Socket\n");
 	close(sockfd);
 	return 0;
