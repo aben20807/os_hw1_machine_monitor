@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
 	FILE *fin;
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 1; i++) {
 		pid_t pid = i;
 		printf("\npid: %d\n", pid);
 		if (!open_file(&fin, create_status_path(pid))) {
@@ -20,6 +20,11 @@ int main(int argc, char **argv)
 		}
 		printf("%s\n", search_value(status_map, "PPid"));
 		printf("%s\n", search_value(status_map, "State"));
+		delete_map(status_map);
+	}
+	pid_t *p = scan_all_processes();
+	for (int i = 0; i < 4; i++) {
+		printf("[%d]", p[i]);
 	}
 	printf("\nexit\n");
 	return 0;
@@ -28,7 +33,7 @@ int main(int argc, char **argv)
 int open_file(FILE **fin, const char *file_name)
 {
 	if (!(*fin = fopen(file_name, "r"))) {
-		printf("No file: %s\n", file_name);
+		perror(file_name);
 		return 0;
 	} else {
 		return 1;
@@ -67,6 +72,18 @@ map create_status_map(FILE *fin)
 	return status_map;
 }
 
+void delete_map(const map m)
+{
+	element_ptr curr_ptr = m;
+	while (curr_ptr != NULL) {
+		element_ptr tmp = curr_ptr;
+		curr_ptr = curr_ptr -> next;
+		free(tmp -> key);
+		free(tmp -> value);
+		free(tmp);
+	}
+}
+
 void split_key_value(const char *line, char **key, char **value)
 {
 	*key = (char *) calloc(30, sizeof(char));
@@ -101,4 +118,28 @@ char* search_value(const map status_map, const char* key)
 		curr_ptr = curr_ptr -> next;
 	}
 	return "ERROR: NOT_FOUND";
+}
+
+
+pid_t *scan_all_processes()
+{
+	DIR *proc = opendir("/proc");
+	struct dirent *entry;
+	pid_t *pid_array = (pid_t *)calloc(300, sizeof(pid_t));
+	int array_count = 0;
+	pid_t pid;
+	if (proc == NULL) {
+		perror("opendir(/proc)");
+		return NULL;
+	}
+	while ((entry = readdir(proc)) != NULL) {
+		if (!isdigit(*entry -> d_name)) {
+			continue;
+		}
+		pid = strtol(entry -> d_name, NULL, 10);
+		pid_array[array_count++] = pid;
+		printf("%d, ", pid);
+	}
+	closedir(proc);
+	return pid_array;
 }
