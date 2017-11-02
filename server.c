@@ -9,15 +9,17 @@ int main(int argc, char **argv)
 		if (!open_file(&fin, create_status_path(pid))) {
 			continue;
 		}
-		map m = create_status_map(fin);
-		element_ptr curr_ptr = m;
+		map status_map = create_status_map(fin);
+		element_ptr curr_ptr = status_map;
 		while (curr_ptr != NULL) {
-			printf("%s:\t",  curr_ptr -> key);
-			printf("%s\n",  curr_ptr -> value);
-			element_ptr tmp = curr_ptr;
+			// printf("%s:\t",  curr_ptr -> key);
+			// printf("%s\n",  curr_ptr -> value);
+			// // element_ptr tmp = curr_ptr;
 			curr_ptr = curr_ptr -> next;
-			free(tmp);
+			// free(tmp);
 		}
+		printf("%s\n", search_value(status_map, "PPid"));
+		printf("%s\n", search_value(status_map, "State"));
 	}
 	printf("\nexit\n");
 	return 0;
@@ -65,7 +67,7 @@ map create_status_map(FILE *fin)
 	return status_map;
 }
 
-void split_key_value(char *line, char **key, char **value)
+void split_key_value(const char *line, char **key, char **value)
 {
 	*key = (char *) calloc(30, sizeof(char));
 	*value = (char *) calloc(30, sizeof(char));
@@ -87,4 +89,16 @@ void split_key_value(char *line, char **key, char **value)
 			(*value)[count++] = line[i];
 		}
 	}
+}
+
+char* search_value(const map status_map, const char* key)
+{
+	element_ptr curr_ptr = status_map;
+	while (curr_ptr != NULL) {
+		if (strcmp(curr_ptr -> key, key) == 0) {
+			return curr_ptr -> value;
+		}
+		curr_ptr = curr_ptr -> next;
+	}
+	return "ERROR: NOT_FOUND";
 }
