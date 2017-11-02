@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv)
 {
-	int sockfd = create_server();
+	int sockfd = create_server(59487);
 	accept_client(sockfd);
 	printf("\nexit\n");
 	return 0;
@@ -120,7 +120,7 @@ pid_t *scan_all_processes()
 	return pid_array;
 }
 
-int create_server()
+int create_server(const int port)
 {
 	int sockfd = 0;
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -133,7 +133,7 @@ int create_server()
 	memset(&server_info, 0, sizeof(server_info));
 	server_info.sin_family = PF_INET;
 	server_info.sin_addr.s_addr = INADDR_ANY;
-	server_info.sin_port = htons(59487);
+	server_info.sin_port = htons(port);
 	bind(sockfd, (struct sockaddr *)&server_info, sizeof(server_info));
 	listen(sockfd, 5);
 	return sockfd;
