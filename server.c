@@ -64,6 +64,10 @@ void delete_map(const map m)
 
 void split_key_value(const char *line, char **key, char **value)
 {
+	/*
+	   Split input line into two parts: key and value
+	   Example: Name:   init -> Name(key), init(value)
+	   */
 	*key = (char *) calloc(KEY_SIZE, sizeof(char));
 	*value = (char *) calloc(VALUE_SIZE, sizeof(char));
 	bool is_colon_appear = false;
@@ -141,7 +145,6 @@ int create_server(const int port)
 
 void accept_client(const int sockfd)
 {
-	// char input_buffer[BUFSIZ] = {};
 	char message[] = {"Hi,this is server.\n"};
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
@@ -170,7 +173,6 @@ void *connection_handler(void *client_sockfd)
 		send(sockfd, input_buffer, sizeof(input_buffer), 0);
 		printf("From %d Get: %s\n", sockfd, input_buffer);
 		fflush(stdout);
-		// write(sockfd, input_buffer, strlen(input_buffer));
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
