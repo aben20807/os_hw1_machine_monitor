@@ -27,4 +27,16 @@ int create_server(const int port);
 void accept_client(const int sockfd);
 void *connection_handler(void *client_sockfd);
 
+char *get_process_info(char command);
+char *get_list_all_process_ids();
+char *get_thread_s_ids();
+char *get_child_s_pids();
+char *get_process_name();
+char *get_state_of_process();
+char *get_cmdline();
+char *get_parent_s_pid();
+char *get_all_ancients_of_pids();
+char *get_virtual_memory_size();
+char *get_physical_memory_size();
+
 #endif

@@ -183,3 +183,52 @@ void *connection_handler(void *client_sockfd)
 	}
 	return 0;
 }
+
+char *get_process_info(char command)
+{
+	switch (command) {
+	case 'a':
+		return get_list_all_process_ids();
+		break;
+	case 'b':
+		return get_thread_s_ids();
+		break;
+	case 'c':
+		return get_child_s_pids();
+		break;
+	case 'd':
+		return get_process_name();
+		break;
+	case 'e':
+		return get_state_of_process();
+		break;
+	case 'f':
+		return get_cmdline();
+		break;
+	case 'g':
+		return get_parent_s_pid();
+		break;
+	case 'h':
+		return get_all_ancients_of_pids();
+		break;
+	case 'i':
+		return get_virtual_memory_size();
+		break;
+	case 'j':
+		return get_physical_memory_size();
+		break;
+	default:
+		break;
+	}
+}
+
+char *get_list_all_process_ids();
+char *get_thread_s_ids();
+char *get_child_s_pids();
+char *get_process_name();
+char *get_state_of_process();
+char *get_cmdline();
+char *get_parent_s_pid();
+char *get_all_ancients_of_pids();
+char *get_virtual_memory_size();
+char *get_physical_memory_size();
