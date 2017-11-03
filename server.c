@@ -4,14 +4,14 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	// printf("%s\n", get_list_all_process_ids());      // (a
-	// printf("%s\n", get_thread_s_ids(1889));          // (b
-	// printf("%s\n", get_process_name(5));             // (d
-	// printf("%s\n", get_state_of_process(7119));      // (e
-	// printf("%s\n", get_cmdline(718));                // (f
-	printf("%s\n", get_parent_s_pid(718));  // (g
-	// printf("%s\n", get_virtual_memory_size(1));      // (i
-	// printf("%s\n", get_physical_memory_size(1777));  // (j
+	printf("%s\n", get_list_all_process_ids());      // (a
+	printf("%s\n", get_thread_s_ids(1889));          // (b
+	printf("%s\n", get_process_name(5));             // (d
+	printf("%s\n", get_state_of_process(1));      // (e
+	printf("%s\n", get_cmdline(718));                // (f
+	printf("%s\n", get_parent_s_pid(1));           // (g
+	printf("%s\n", get_virtual_memory_size(1));      // (i
+	printf("%s\n", get_physical_memory_size(1));  // (j
 	printf("\nexit\n");
 	return 0;
 }
@@ -217,6 +217,18 @@ char *convert_int_array_to_char_array(const int *int_array)
 	return result;
 }
 
+char *get_status_file_field(const pid_t pid, const char *field)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(result, search_value(status_map, field), VALUE_SIZE);
+	delete_map(status_map);
+	return result;
+}
+
 /*char *get_process_info(char command)
   {
   switch (command) {
@@ -261,41 +273,33 @@ char *get_list_all_process_ids()
 	return convert_int_array_to_char_array((int *)pid_array);
 }
 
-char *get_thread_s_ids(pid_t pid)
+char *get_thread_s_ids(const pid_t pid)
 {
 	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
 	return convert_int_array_to_char_array((int *)tid_array);
 }
+
 // char *get_child_s_pids(){}
-char *get_process_name(pid_t pid)
+
+char *get_process_name(const pid_t pid)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-	}
-	map status_map = create_status_map(fin);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(result, search_value(status_map, "Name"), VALUE_SIZE);
-	delete_map(status_map);
-	return result;
+	return get_status_file_field(pid, "Name");
 }
-char *get_state_of_process(pid_t pid)
+
+char *get_state_of_process(const pid_t pid)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-	}
-	map status_map = create_status_map(fin);
 	char *tmp = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(tmp, search_value(status_map, "State"), VALUE_SIZE);
-	delete_map(status_map);
+	strncpy(tmp, get_status_file_field(pid, "State"), VALUE_SIZE);
 	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
 	result[0] = tmp[0];
 	result[1] = '\0';
+	free(tmp);
 	return result;
 }
 
-char *get_cmdline(pid_t pid)
+char *get_cmdline(const pid_t pid)
 {
 	FILE *fin;
 	if (!open_file(&fin, create_cmdline_path(pid))) {
@@ -310,38 +314,19 @@ char *get_cmdline(pid_t pid)
 	return result;
 }
 
-char *get_parent_s_pid(pid_t pid)
+char *get_parent_s_pid(const pid_t pid)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-	}
-	map status_map = create_status_map(fin);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(result, search_value(status_map, "PPid"), VALUE_SIZE);
-	delete_map(status_map);
-	return result;
-}
-// char *get_all_ancients_of_pids(){}
-char *get_virtual_memory_size(pid_t pid)
-{
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-	}
-	map status_map = create_status_map(fin);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(result, search_value(status_map, "VmSize"), VALUE_SIZE);
-	delete_map(status_map);
-	return result;
+	return get_status_file_field(pid, "PPid");
 }
 
-char *get_physical_memory_size(pid_t pid)
+// char *get_all_ancients_of_pids(const pid_t pid){}
+
+char *get_virtual_memory_size(const pid_t pid)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-	}
-	map status_map = create_status_map(fin);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(result, search_value(status_map, "VmRSS"), VALUE_SIZE);
-	delete_map(status_map);
-	return result;
+	return get_status_file_field(pid, "VmSize");
+}
+
+char *get_physical_memory_size(const pid_t pid)
+{
+	return get_status_file_field(pid, "VmRSS");
 }

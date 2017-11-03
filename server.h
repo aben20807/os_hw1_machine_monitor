@@ -33,17 +33,18 @@ int create_server(const int port);
 void accept_client(const int sockfd);
 void *connection_handler(void *client_sockfd);
 char *convert_int_array_to_char_array(const int *int_array);
+char *get_status_file_field(const pid_t pid, const char *field);
 
 char *get_process_info(char command);
 char *get_list_all_process_ids();
-char *get_thread_s_ids(pid_t pid);
-char *get_child_s_pids(pid_t pid);
-char *get_process_name(pid_t pid);
-char *get_state_of_process(pid_t pid);
-char *get_cmdline(pid_t pid);
-char *get_parent_s_pid(pid_t pid);
-char *get_all_ancients_of_pids(pid_t pid);
-char *get_virtual_memory_size(pid_t pid);
-char *get_physical_memory_size(pid_t pid);
+char *get_thread_s_ids(const pid_t pid);
+char *get_child_s_pids(const pid_t pid);
+char *get_process_name(const pid_t pid);
+char *get_state_of_process(const pid_t pid);
+char *get_cmdline(const pid_t pid);
+char *get_parent_s_pid(const pid_t pid);
+char *get_all_ancients_of_pids(const pid_t pid);
+char *get_virtual_memory_size(const pid_t pid);
+char *get_physical_memory_size(const pid_t pid);
 
 #endif
