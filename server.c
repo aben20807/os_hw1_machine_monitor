@@ -8,7 +8,8 @@ int main(int argc, char **argv)
 	// printf("%s\n", get_thread_s_ids(1889));          // (b
 	// printf("%s\n", get_process_name(5));             // (d
 	// printf("%s\n", get_state_of_process(7119));      // (e
-	printf("%s\n", get_cmdline(718));  // (f
+	// printf("%s\n", get_cmdline(718));                // (f
+	printf("%s\n", get_parent_s_pid(718));  // (g
 	// printf("%s\n", get_virtual_memory_size(1));      // (i
 	// printf("%s\n", get_physical_memory_size(1777));  // (j
 	printf("\nexit\n");
@@ -308,7 +309,18 @@ char *get_cmdline(pid_t pid)
 	fclose(fin);
 	return result;
 }
-// char *get_parent_s_pid(){}
+
+char *get_parent_s_pid(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(result, search_value(status_map, "PPid"), VALUE_SIZE);
+	delete_map(status_map);
+	return result;
+}
 // char *get_all_ancients_of_pids(){}
 char *get_virtual_memory_size(pid_t pid)
 {
