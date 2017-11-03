@@ -7,7 +7,9 @@ int main(int argc, char **argv)
 	// printf("%s\n", get_list_all_process_ids());      // (a
 	// printf("%s\n", get_thread_s_ids(1889));          // (b
 	// printf("%s\n", get_process_name(5));             // (d
-	printf("%s\n", get_state_of_process(7119));         // (e
+	// printf("%s\n", get_state_of_process(7119));      // (e
+	printf("%s\n", get_virtual_memory_size(1));// (i
+	printf("%s\n", get_physical_memory_size(1777));// (j
 	printf("\nexit\n");
 	return 0;
 }
@@ -286,5 +288,26 @@ char *get_state_of_process(pid_t pid)
 // char *get_cmdline(){}
 // char *get_parent_s_pid(){}
 // char *get_all_ancients_of_pids(){}
-// char *get_virtual_memory_size(){}
-// char *get_physical_memory_size(){}
+char *get_virtual_memory_size(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(result, search_value(status_map, "VmSize"), VALUE_SIZE);
+	delete_map(status_map);
+	return result;
+}
+
+char *get_physical_memory_size(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(result, search_value(status_map, "VmRSS"), VALUE_SIZE);
+	delete_map(status_map);
+	return result;
+}
