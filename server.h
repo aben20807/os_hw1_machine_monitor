@@ -35,13 +35,13 @@ char *convert_int_array_to_char_array(const int *int_array);
 char *get_process_info(char command);
 char *get_list_all_process_ids();
 char *get_thread_s_ids(pid_t pid);
-char *get_child_s_pids();
+char *get_child_s_pids(pid_t pid);
 char *get_process_name(pid_t pid);
-char *get_state_of_process();
-char *get_cmdline();
-char *get_parent_s_pid();
-char *get_all_ancients_of_pids();
-char *get_virtual_memory_size();
-char *get_physical_memory_size();
+char *get_state_of_process(pid_t pid);
+char *get_cmdline(pid_t pid);
+char *get_parent_s_pid(pid_t pid);
+char *get_all_ancients_of_pids(pid_t pid);
+char *get_virtual_memory_size(pid_t pid);
+char *get_physical_memory_size(pid_t pid);
 
 #endif

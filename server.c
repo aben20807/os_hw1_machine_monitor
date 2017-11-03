@@ -4,9 +4,10 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	// printf("%s", get_list_all_process_ids());
-	// printf("%s", get_thread_s_ids(1889));
-	printf("%s", get_process_name(5));
+	// printf("%s\n", get_list_all_process_ids());      // (a
+	// printf("%s\n", get_thread_s_ids(1889));          // (b
+	// printf("%s\n", get_process_name(5));             // (d
+	printf("%s\n", get_state_of_process(7119));         // (e
 	printf("\nexit\n");
 	return 0;
 }
@@ -268,7 +269,20 @@ char *get_process_name(pid_t pid)
 	delete_map(status_map);
 	return result;
 }
-// char *get_state_of_process(){}
+char *get_state_of_process(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *tmp = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(tmp, search_value(status_map, "State"), VALUE_SIZE);
+	delete_map(status_map);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	result[0] = tmp[0];
+	result[1] = '\0';
+	return result;
+}
 // char *get_cmdline(){}
 // char *get_parent_s_pid(){}
 // char *get_all_ancients_of_pids(){}
