@@ -7,6 +7,7 @@
 #define KEY_SIZE 30
 #define VALUE_SIZE 30
 #define PROC_NUM 300
+#define LIST_CHAR_LENGTH 1000
 
 typedef struct Element *element_ptr;
 typedef element_ptr map;

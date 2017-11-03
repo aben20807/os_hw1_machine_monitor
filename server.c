@@ -2,8 +2,9 @@
 
 int main(int argc, char **argv)
 {
-	int sockfd = create_server(59487);
-	accept_client(sockfd);
+	// int sockfd = create_server(59487);
+	// accept_client(sockfd);
+	printf("%s", get_list_all_process_ids());
 	printf("\nexit\n");
 	return 0;
 }
@@ -120,6 +121,7 @@ pid_t *scan_all_processes()
 		pid = strtol(entry -> d_name, NULL, 10);
 		pid_array[array_count++] = pid;
 	}
+	pid_array[array_count] = -1;
 	closedir(proc);
 	return pid_array;
 }
@@ -184,51 +186,66 @@ void *connection_handler(void *client_sockfd)
 	return 0;
 }
 
-char *get_process_info(char command)
+/*char *get_process_info(char command)
+  {
+  switch (command) {
+  case 'a':
+  return get_list_all_process_ids();
+  break;
+  case 'b':
+  return get_thread_s_ids();
+  break;
+  case 'c':
+  return get_child_s_pids();
+  break;
+  case 'd':
+  return get_process_name();
+  break;
+  case 'e':
+  return get_state_of_process();
+  break;
+  case 'f':
+  return get_cmdline();
+  break;
+  case 'g':
+  return get_parent_s_pid();
+  break;
+  case 'h':
+  return get_all_ancients_of_pids();
+  break;
+  case 'i':
+  return get_virtual_memory_size();
+  break;
+  case 'j':
+  return get_physical_memory_size();
+  break;
+  default:
+  break;
+  }
+  }*/
+
+char *get_list_all_process_ids()
 {
-	switch (command) {
-	case 'a':
-		return get_list_all_process_ids();
-		break;
-	case 'b':
-		return get_thread_s_ids();
-		break;
-	case 'c':
-		return get_child_s_pids();
-		break;
-	case 'd':
-		return get_process_name();
-		break;
-	case 'e':
-		return get_state_of_process();
-		break;
-	case 'f':
-		return get_cmdline();
-		break;
-	case 'g':
-		return get_parent_s_pid();
-		break;
-	case 'h':
-		return get_all_ancients_of_pids();
-		break;
-	case 'i':
-		return get_virtual_memory_size();
-		break;
-	case 'j':
-		return get_physical_memory_size();
-		break;
-	default:
-		break;
+	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	pid_t *pid_array = scan_all_processes();
+	int i = 0;
+	while (pid_array[i] != -1) {
+		char *tmp_pid = (char *)calloc(8, sizeof(char));
+		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", pid_array[i]);
+		strcat(result, tmp_pid);
+		free(tmp_pid);
+		i++;
 	}
+	return result;
 }
 
-char *get_list_all_process_ids();
-char *get_thread_s_ids();
-char *get_child_s_pids();
-char *get_process_name();
-char *get_state_of_process();
-char *get_cmdline();
-char *get_parent_s_pid();
-char *get_all_ancients_of_pids();
-char *get_virtual_memory_size();
-char *get_physical_memory_size();
+/*
+   char *get_thread_s_ids(){}
+   char *get_child_s_pids(){}
+   char *get_process_name(){}
+   char *get_state_of_process(){}
+   char *get_cmdline(){}
+   char *get_parent_s_pid(){}
+   char *get_all_ancients_of_pids(){}
+   char *get_virtual_memory_size(){}
+   char *get_physical_memory_size(){}*/
