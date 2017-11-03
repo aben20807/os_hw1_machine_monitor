@@ -4,8 +4,8 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	// printf("%s", get_list_all_process_ids());
-	printf("%s", get_thread_s_ids(1889));
+	printf("%s", get_list_all_process_ids());
+	// printf("%s", get_thread_s_ids(1889));
 	printf("\nexit\n");
 	return 0;
 }
@@ -190,6 +190,20 @@ void *connection_handler(void *client_sockfd)
 	return 0;
 }
 
+char *convert_int_array_to_char_array(const int *int_array)
+{
+	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	int i = 0;
+	while (int_array[i] != -1) {
+		char *tmp_pid = (char *)calloc(8, sizeof(char));
+		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", int_array[i]);
+		strcat(result, tmp_pid);
+		free(tmp_pid);
+		i++;
+	}
+	return result;
+}
+
 /*char *get_process_info(char command)
   {
   switch (command) {
@@ -230,34 +244,16 @@ void *connection_handler(void *client_sockfd)
 
 char *get_list_all_process_ids()
 {
-	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
 	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
-	int i = 0;
-	while (pid_array[i] != -1) {
-		char *tmp_pid = (char *)calloc(8, sizeof(char));
-		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", pid_array[i]);
-		strcat(result, tmp_pid);
-		free(tmp_pid);
-		i++;
-	}
-	return result;
+	return convert_int_array_to_char_array((int *)pid_array);
 }
 
 char *get_thread_s_ids(pid_t pid)
 {
 	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
-	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
-	int i = 0;
-	while (tid_array[i] != -1) {
-		char *tmp_pid = (char *)calloc(8, sizeof(char));
-		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", tid_array[i]);
-		strcat(result, tmp_pid);
-		free(tmp_pid);
-		i++;
-	}
-	return result;
+	return convert_int_array_to_char_array((int *)tid_array);
 }
 /*
    char *get_child_s_pids(){}
