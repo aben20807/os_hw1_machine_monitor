@@ -20,8 +20,8 @@ int open_file(FILE **fin, const char *file_name)
 
 char *create_status_path(const pid_t pid)
 {
-	char *path = (char *) malloc(sizeof(char) * 40);
-	snprintf(path, 40, "/proc/%d/status", pid);
+	char *path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	snprintf(path, PATH_SIZE, "/proc/%d/status", pid);
 	return path;
 }
 
@@ -64,8 +64,8 @@ void delete_map(const map m)
 
 void split_key_value(const char *line, char **key, char **value)
 {
-	*key = (char *) calloc(30, sizeof(char));
-	*value = (char *) calloc(30, sizeof(char));
+	*key = (char *) calloc(KEY_SIZE, sizeof(char));
+	*value = (char *) calloc(VALUE_SIZE, sizeof(char));
 	bool is_colon_appear = false;
 	int count = 0;
 	for (int i = 0; i < strlen(line); i++) {
@@ -102,7 +102,7 @@ pid_t *scan_all_processes()
 {
 	DIR *proc = opendir("/proc");
 	struct dirent *entry;
-	pid_t *pid_array = (pid_t *)calloc(300, sizeof(pid_t));
+	pid_t *pid_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
 	int array_count = 0;
 	pid_t pid;
 	if (proc == NULL) {
@@ -141,13 +141,13 @@ int create_server(const int port)
 
 void accept_client(const int sockfd)
 {
-	char input_buffer[256] = {};
+	char input_buffer[BUFSIZ] = {};
 	char message[] = {"Hi,this is server.\n"};
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
 	socklen_t addrlen = sizeof(client_info);
 	while ((1)) {
-		client_sockfd = accept(sockfd, (struct sockaddr*) &client_info, &addrlen);
+		client_sockfd = accept(sockfd, (struct sockaddr*)&client_info, &addrlen);
 		printf("Accepted one\n");
 		send(client_sockfd, message, sizeof(message), 0);
 		recv(client_sockfd, input_buffer, sizeof(input_buffer), 0);
@@ -166,8 +166,7 @@ void *connection_handler(void *sockfd)
 {
 	int sock = *(int*)sockfd;
 	int read_size;
-	// char input_buffer[2000];
-	char input_buffer[256] = {};
+	char input_buffer[BUFSIZ] = {};
 	while ((read_size = recv(sock, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
 		printf("Get:%s\n", input_buffer);

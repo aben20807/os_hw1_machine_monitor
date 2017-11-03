@@ -3,6 +3,11 @@
 
 #include "protocol.h"
 
+#define PATH_SIZE 40
+#define KEY_SIZE 30
+#define VALUE_SIZE 30
+#define PROC_NUM 300
+
 typedef struct Element *element_ptr;
 typedef element_ptr map;
 struct Element {
