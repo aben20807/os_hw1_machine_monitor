@@ -4,7 +4,8 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	printf("%s", get_list_all_process_ids());
+	// printf("%s", get_list_all_process_ids());
+	printf("%s", get_thread_s_ids(1889));
 	printf("\nexit\n");
 	return 0;
 }
@@ -103,12 +104,7 @@ char* search_value(const map status_map, const char* key)
 	return "ERROR: NOT_FOUND";
 }
 
-pid_t *scan_all_processes()
-{
-	return (pid_t *)scan_digital_dir("/proc");
-}
-
-int *scan_digital_dir(const char *path)
+int *scan_all_digital_directories(const char *path)
 {
 	DIR *proc = opendir(path);
 	struct dirent *entry;
@@ -235,7 +231,7 @@ void *connection_handler(void *client_sockfd)
 char *get_list_all_process_ids()
 {
 	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
-	pid_t *pid_array = scan_all_processes();
+	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
 	int i = 0;
 	while (pid_array[i] != -1) {
 		char *tmp_pid = (char *)calloc(8, sizeof(char));
@@ -247,13 +243,23 @@ char *get_list_all_process_ids()
 	return result;
 }
 
+char *get_thread_s_ids(pid_t pid)
+{
+	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
+	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
+	int i = 0;
+	while (tid_array[i] != -1) {
+		char *tmp_pid = (char *)calloc(8, sizeof(char));
+		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", tid_array[i]);
+		strcat(result, tmp_pid);
+		free(tmp_pid);
+		i++;
+	}
+	return result;
+}
 /*
-   char *get_thread_s_ids(pid_t pid)
-   {
-   char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
-   snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
-
-   }
    char *get_child_s_pids(){}
    char *get_process_name(){}
    char *get_state_of_process(){}
