@@ -6,6 +6,7 @@
 #define PATH_SIZE 40
 #define KEY_SIZE 30
 #define VALUE_SIZE 30
+#define ERRMSG_SIZE 30
 #define PROC_NUM 300
 #define LIST_CHAR_LENGTH 1000
 
@@ -24,6 +25,7 @@ void delete_map(const map m);
 void split_key_value(const char *line, char **key, char **value);
 char *search_value(const map status_map, const char* key);
 pid_t *scan_all_processes();
+int *scan_digital_dir(const char *path);
 int create_server(const int port);
 void accept_client(const int sockfd);
 void *connection_handler(void *client_sockfd);

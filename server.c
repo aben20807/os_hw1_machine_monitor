@@ -105,13 +105,21 @@ char* search_value(const map status_map, const char* key)
 
 pid_t *scan_all_processes()
 {
-	DIR *proc = opendir("/proc");
+	return (pid_t *)scan_digital_dir("/proc");
+}
+
+int *scan_digital_dir(const char *path)
+{
+	DIR *proc = opendir(path);
 	struct dirent *entry;
 	pid_t *pid_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
 	int array_count = 0;
 	pid_t pid;
 	if (proc == NULL) {
-		perror("opendir(/proc)");
+		char *err_msg = (char *)calloc(ERRMSG_SIZE, sizeof(char));
+		sprintf(err_msg, "opendir(%s)", path);
+		perror(err_msg);
+		free(err_msg);
 		return NULL;
 	}
 	while ((entry = readdir(proc)) != NULL) {
@@ -240,7 +248,12 @@ char *get_list_all_process_ids()
 }
 
 /*
-   char *get_thread_s_ids(){}
+   char *get_thread_s_ids(pid_t pid)
+   {
+   char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
+   snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
+
+   }
    char *get_child_s_pids(){}
    char *get_process_name(){}
    char *get_state_of_process(){}
