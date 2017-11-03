@@ -34,9 +34,9 @@ char *convert_int_array_to_char_array(const int *int_array);
 
 char *get_process_info(char command);
 char *get_list_all_process_ids();
-char *get_thread_s_ids();
+char *get_thread_s_ids(pid_t pid);
 char *get_child_s_pids();
-char *get_process_name();
+char *get_process_name(pid_t pid);
 char *get_state_of_process();
 char *get_cmdline();
 char *get_parent_s_pid();

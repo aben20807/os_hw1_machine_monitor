@@ -4,8 +4,9 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	printf("%s", get_list_all_process_ids());
+	// printf("%s", get_list_all_process_ids());
 	// printf("%s", get_thread_s_ids(1889));
+	printf("%s", get_process_name(5));
 	printf("\nexit\n");
 	return 0;
 }
@@ -255,12 +256,21 @@ char *get_thread_s_ids(pid_t pid)
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
 	return convert_int_array_to_char_array((int *)tid_array);
 }
-/*
-   char *get_child_s_pids(){}
-   char *get_process_name(){}
-   char *get_state_of_process(){}
-   char *get_cmdline(){}
-   char *get_parent_s_pid(){}
-   char *get_all_ancients_of_pids(){}
-   char *get_virtual_memory_size(){}
-   char *get_physical_memory_size(){}*/
+// char *get_child_s_pids(){}
+char *get_process_name(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_status_path(pid))) {
+	}
+	map status_map = create_status_map(fin);
+	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	strncpy(result, search_value(status_map, "Name"), VALUE_SIZE);
+	delete_map(status_map);
+	return result;
+}
+// char *get_state_of_process(){}
+// char *get_cmdline(){}
+// char *get_parent_s_pid(){}
+// char *get_all_ancients_of_pids(){}
+// char *get_virtual_memory_size(){}
+// char *get_physical_memory_size(){}
