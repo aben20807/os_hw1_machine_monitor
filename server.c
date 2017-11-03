@@ -141,7 +141,7 @@ int create_server(const int port)
 
 void accept_client(const int sockfd)
 {
-	char input_buffer[BUFSIZ] = {};
+	// char input_buffer[BUFSIZ] = {};
 	char message[] = {"Hi,this is server.\n"};
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
@@ -150,8 +150,6 @@ void accept_client(const int sockfd)
 		client_sockfd = accept(sockfd, (struct sockaddr*)&client_info, &addrlen);
 		printf("Accepted one\n");
 		send(client_sockfd, message, sizeof(message), 0);
-		recv(client_sockfd, input_buffer, sizeof(input_buffer), 0);
-		printf("Get:%s\n", input_buffer);
 		pthread_t thread_id;
 		if (pthread_create(&thread_id, NULL, connection_handler,
 		                   (void*)&client_sockfd) < 0) {
@@ -162,16 +160,17 @@ void accept_client(const int sockfd)
 	}
 }
 
-void *connection_handler(void *sockfd)
+void *connection_handler(void *client_sockfd)
 {
-	int sock = *(int*)sockfd;
+	int sockfd = *(int*)client_sockfd;
 	int read_size;
 	char input_buffer[BUFSIZ] = {};
-	while ((read_size = recv(sock, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
+	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
-		printf("Get:%s\n", input_buffer);
+		send(sockfd, input_buffer, sizeof(input_buffer), 0);
+		printf("From %d Get: %s\n", sockfd, input_buffer);
 		fflush(stdout);
-		// write(sock, input_buffer, strlen(input_buffer));
+		// write(sockfd, input_buffer, strlen(input_buffer));
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
