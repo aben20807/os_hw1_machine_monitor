@@ -7,6 +7,7 @@
 #define KEY_SIZE 30
 #define VALUE_SIZE 30
 #define ERRMSG_SIZE 30
+#define CMDLINE_SIZE 100
 #define PROC_NUM 300
 #define LIST_CHAR_LENGTH 1000
 
@@ -22,6 +23,7 @@ struct Element {
 
 int open_file(FILE** fin, const char* fileName);
 char *create_status_path(const pid_t pid);
+char *create_cmdline_path(const pid_t pid);
 map create_status_map(FILE *fin);
 void delete_map(const map m);
 void split_key_value(const char *line, char **key, char **value);

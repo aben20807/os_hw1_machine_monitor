@@ -8,8 +8,9 @@ int main(int argc, char **argv)
 	// printf("%s\n", get_thread_s_ids(1889));          // (b
 	// printf("%s\n", get_process_name(5));             // (d
 	// printf("%s\n", get_state_of_process(7119));      // (e
-	printf("%s\n", get_virtual_memory_size(1));// (i
-	printf("%s\n", get_physical_memory_size(1777));// (j
+	printf("%s\n", get_cmdline(718));  // (f
+	// printf("%s\n", get_virtual_memory_size(1));      // (i
+	// printf("%s\n", get_physical_memory_size(1777));  // (j
 	printf("\nexit\n");
 	return 0;
 }
@@ -28,6 +29,13 @@ char *create_status_path(const pid_t pid)
 {
 	char *path = (char *) malloc(sizeof(char) * PATH_SIZE);
 	snprintf(path, PATH_SIZE, "/proc/%d/status", pid);
+	return path;
+}
+
+char *create_cmdline_path(const pid_t pid)
+{
+	char *path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	snprintf(path, PATH_SIZE, "/proc/%d/cmdline", pid);
 	return path;
 }
 
@@ -285,7 +293,21 @@ char *get_state_of_process(pid_t pid)
 	result[1] = '\0';
 	return result;
 }
-// char *get_cmdline(){}
+
+char *get_cmdline(pid_t pid)
+{
+	FILE *fin;
+	if (!open_file(&fin, create_cmdline_path(pid))) {
+	}
+	char *result = (char *)calloc(CMDLINE_SIZE, sizeof(char));
+	char c;
+	int count = 0;
+	while ((c = fgetc(fin)) != EOF) { //read all char until end of file
+		result[count++] = c;
+	}
+	fclose(fin);
+	return result;
+}
 // char *get_parent_s_pid(){}
 // char *get_all_ancients_of_pids(){}
 char *get_virtual_memory_size(pid_t pid)
