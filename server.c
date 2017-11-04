@@ -217,7 +217,7 @@ void *connection_handler(void *client_sockfd)
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
-		printf("Client disconnected");
+		printf("Client disconnected\n");
 		fflush(stdout);
 	} else if (read_size == -1) {
 		perror("recv failed");
