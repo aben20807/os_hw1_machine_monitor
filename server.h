@@ -40,12 +40,7 @@ char *get_process_info(const char command, const pid_t pid);
 char *get_list_all_process_ids();
 char *get_thread_s_ids(const pid_t pid);
 char *get_child_s_pids(const pid_t pid);
-char *get_process_name(const pid_t pid);
-char *get_state_of_process(const pid_t pid);
 char *get_cmdline(const pid_t pid);
-char *get_parent_s_pid(const pid_t pid);
 char *get_all_ancients_of_pids(const pid_t pid);
-char *get_virtual_memory_size(const pid_t pid);
-char *get_physical_memory_size(const pid_t pid);
 
 #endif

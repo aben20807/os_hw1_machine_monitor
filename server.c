@@ -2,18 +2,18 @@
 
 int main(int argc, char **argv)
 {
-	int sockfd = create_server(59487);
-	accept_client(sockfd);
-	// printf("a) %s\n", get_list_all_process_ids());
-	// printf("b) %s\n", get_thread_s_ids(2173));
-	// printf("c) %s\n", get_child_s_pids(1));
-	// printf("d) %s\n", get_process_name(5));
-	// printf("e) %s\n", get_state_of_process(1));
-	// printf("f) %s\n", get_cmdline(1));
-	// printf("g) %s\n", get_parent_s_pid(1));
-	// printf("h) %s\n", get_all_ancients_of_pids(5));
-	// printf("i) %s\n", get_virtual_memory_size(5));
-	// printf("j) %s\n", get_physical_memory_size(1));
+	// int sockfd = create_server(59487);
+	// accept_client(sockfd);
+	printf("a) %s\n", get_process_info('a', 0));
+	printf("b) %s\n", get_process_info('b', 1));
+	printf("c) %s\n", get_process_info('c', 1));
+	printf("d) %s\n", get_process_info('d', 5));
+	printf("e) %s\n", get_process_info('e', 1));
+	printf("f) %s\n", get_process_info('f', 1));
+	printf("g) %s\n", get_process_info('g', 1));
+	printf("h) %s\n", get_process_info('h', 5));
+	printf("i) %s\n", get_process_info('i', 1));
+	printf("j) %s\n", get_process_info('j', 1));
 	// while (1) {
 	//     printf("which? ");
 	//     char command;
@@ -191,7 +191,7 @@ void accept_client(const int sockfd)
 		printf("Accepted one\n");
 		pthread_t thread_id;
 		if (pthread_create(&thread_id, NULL, connection_handler,
-		                   (void*)&client_sockfd) < 0) {
+		                   (void *)&client_sockfd) < 0) {
 			perror("could not create thread");
 		}
 		printf("Handler assigned\n");
@@ -266,25 +266,25 @@ char *get_process_info(const char command, const pid_t pid)
 		return get_child_s_pids(pid);
 		break;
 	case 'd':
-		return get_process_name(pid);
+		return get_status_file_field(pid, "Name");
 		break;
 	case 'e':
-		return get_state_of_process(pid);
+		return get_status_file_field(pid, "State");
 		break;
 	case 'f':
 		return get_cmdline(pid);
 		break;
 	case 'g':
-		return get_parent_s_pid(pid);
+		return get_status_file_field(pid, "PPid");
 		break;
 	case 'h':
 		return get_all_ancients_of_pids(pid);
 		break;
 	case 'i':
-		return get_virtual_memory_size(pid);
+		return get_status_file_field(pid, "VmSize");
 		break;
 	case 'j':
-		return get_physical_memory_size(pid);
+		return get_status_file_field(pid, "VmRSS");
 		break;
 	default:
 		return "ERROR: COMMAND_NOT_FOUND";
@@ -335,16 +335,6 @@ char *get_child_s_pids(const pid_t pid)
 	return convert_int_array_to_char_array(child_array);
 }
 
-char *get_process_name(const pid_t pid)
-{
-	return get_status_file_field(pid, "Name");
-}
-
-char *get_state_of_process(const pid_t pid)
-{
-	return get_status_file_field(pid, "State");
-}
-
 char *get_cmdline(const pid_t pid)
 {
 	FILE *fin;
@@ -363,11 +353,6 @@ char *get_cmdline(const pid_t pid)
 	} else {
 		return result;
 	}
-}
-
-char *get_parent_s_pid(const pid_t pid)
-{
-	return get_status_file_field(pid, "PPid");
 }
 
 char *get_all_ancients_of_pids(const pid_t pid)
@@ -390,14 +375,4 @@ char *get_all_ancients_of_pids(const pid_t pid)
 	}
 	strcat(result, (strlen(result) == 0) ? "0" : " 0"); // add 0 ppid
 	return result;
-}
-
-char *get_virtual_memory_size(const pid_t pid)
-{
-	return get_status_file_field(pid, "VmSize");
-}
-
-char *get_physical_memory_size(const pid_t pid)
-{
-	return get_status_file_field(pid, "VmRSS");
 }
