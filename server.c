@@ -4,14 +4,15 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	printf("%s\n", get_list_all_process_ids());      // (a
-	printf("%s\n", get_thread_s_ids(1889));          // (b
-	printf("%s\n", get_process_name(5));             // (d
-	printf("%s\n", get_state_of_process(1));      // (e
-	printf("%s\n", get_cmdline(718));                // (f
-	printf("%s\n", get_parent_s_pid(1));           // (g
-	printf("%s\n", get_virtual_memory_size(1));      // (i
-	printf("%s\n", get_physical_memory_size(1));  // (j
+	// printf("%s\n", get_list_all_process_ids());      // (a
+	// printf("%s\n", get_thread_s_ids(1889));          // (b
+	// printf("%s\n", get_process_name(5));             // (d
+	// printf("%s\n", get_state_of_process(1));      // (e
+	// printf("%s\n", get_cmdline(718));                // (f
+	// printf("%s\n", get_parent_s_pid(1));           // (g
+	// printf("%s\n", get_virtual_memory_size(1));      // (i
+	// printf("%s\n", get_physical_memory_size(1));  // (j
+	printf("%s\n", get_child_s_pids(1));  // (j
 	printf("\nexit\n");
 	return 0;
 }
@@ -114,7 +115,7 @@ char* search_value(const map status_map, const char* key)
 		}
 		curr_ptr = curr_ptr -> next;
 	}
-	return "ERROR: NOT_FOUND";
+	return "ERROR: KET_NOT_FOUND";
 }
 
 int *scan_all_digital_directories(const char *path)
@@ -221,6 +222,7 @@ char *get_status_file_field(const pid_t pid, const char *field)
 {
 	FILE *fin;
 	if (!open_file(&fin, create_status_path(pid))) {
+		return "ERROR: FILE_NOT_FOUND";
 	}
 	map status_map = create_status_map(fin);
 	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
@@ -281,7 +283,23 @@ char *get_thread_s_ids(const pid_t pid)
 	return convert_int_array_to_char_array((int *)tid_array);
 }
 
-// char *get_child_s_pids(){}
+char *get_child_s_pids(const pid_t pid)
+{
+	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
+	pid_t *child_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
+	int pid_count = 0, child_count = 0;
+	char *tmp = (char *)calloc(ID_WIDTH, sizeof(char));
+	snprintf(tmp, ID_WIDTH, "%d", pid);
+	while (pid_array[pid_count] != -1) {
+		if (strcmp(tmp, get_status_file_field(pid_array[pid_count], "PPid")) == 0) {
+			child_array[child_count++] = pid_array[pid_count];
+		}
+		pid_count++;
+	}
+	child_array[child_count] = -1;
+	free(tmp);
+	return convert_int_array_to_char_array(child_array);
+}
 
 char *get_process_name(const pid_t pid)
 {

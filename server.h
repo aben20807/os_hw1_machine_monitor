@@ -8,6 +8,7 @@
 #define VALUE_SIZE 30
 #define ERRMSG_SIZE 30
 #define CMDLINE_SIZE 100
+#define ID_WIDTH 10
 #define PROC_NUM 300
 #define LIST_CHAR_LENGTH 1000
 
