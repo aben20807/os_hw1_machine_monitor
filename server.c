@@ -183,14 +183,12 @@ int create_server(const int port)
 
 void accept_client(const int sockfd)
 {
-	char message[] = {"Hi,this is server.\n"};
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
 	socklen_t addrlen = sizeof(client_info);
 	while ((1)) {
 		client_sockfd = accept(sockfd, (struct sockaddr*)&client_info, &addrlen);
 		printf("Accepted one\n");
-		// send(client_sockfd, message, sizeof(message), 0);
 		pthread_t thread_id;
 		if (pthread_create(&thread_id, NULL, connection_handler,
 		                   (void*)&client_sockfd) < 0) {

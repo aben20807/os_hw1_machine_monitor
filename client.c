@@ -71,11 +71,14 @@ void *send_command(void *server_sockfd)
 		}
 		if (c != 'a') {
 			printf("pid? ");
-			scanf("%d", &pid);
+			if (!scanf("%d", &pid)) {
+				printf("ERROR: input pid");
+			}
 		}
 		sprintf(message, "%c%d", c, pid);
 		send(sockfd, message, sizeof(message), 0);
 	}
+	return 0;
 }
 
 void *connection_handler(void *server_sockfd)
