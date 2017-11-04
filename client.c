@@ -83,11 +83,12 @@ void *connection_handler(void *server_sockfd)
 	int sockfd = *(int*)server_sockfd;
 	int read_size;
 	char input_buffer[BUFSIZ] = {};
+	// printf("%d", BUFSIZ);
 	fflush(stdout);
 	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
 		printf("Get: %s\n", input_buffer);
-		fflush(stdout);
+		// fflush(stdout);
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {

@@ -208,8 +208,13 @@ void *connection_handler(void *client_sockfd)
 	char input_buffer[BUFSIZ] = {};
 	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
-		send(sockfd, input_buffer, sizeof(input_buffer), 0);
 		printf("From %d Get: %s\n", sockfd, input_buffer);
+		char command = input_buffer[0];
+		input_buffer[0] = '0';
+		pid_t pid = atoi(input_buffer);
+		char output_buffer[BUFSIZ];// = {"Hi,this is server.\n"};
+		strncpy(output_buffer, get_process_info(command, pid), BUFSIZ);
+		send(sockfd, output_buffer, sizeof(output_buffer), 0);
 		fflush(stdout);
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
