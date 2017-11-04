@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	printf("f) %s\n", get_cmdline(1));
 	printf("g) %s\n", get_parent_s_pid(1));
 	printf("h) %s\n", get_all_ancients_of_pids(5));
-	printf("i) %s\n", get_virtual_memory_size(1));
+	printf("i) %s\n", get_virtual_memory_size(5));
 	printf("j) %s\n", get_physical_memory_size(1));
 	printf("\nexit\n");
 	return 0;
@@ -119,24 +119,24 @@ char* search_value(const map status_map, const char* key)
 		}
 		curr_ptr = curr_ptr -> next;
 	}
-	return "ERROR: KET_NOT_FOUND";
+	return "ERROR: FIELD_NOT_FOUND";
 }
 
 int *scan_all_digital_directories(const char *path)
 {
-	DIR *proc = opendir(path);
+	DIR *dir = opendir(path);
 	struct dirent *entry;
 	pid_t *pid_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
 	int array_count = 0;
 	pid_t pid;
-	if (proc == NULL) {
+	if (dir == NULL) {
 		char *err_msg = (char *)calloc(ERRMSG_SIZE, sizeof(char));
 		sprintf(err_msg, "opendir(%s)", path);
 		perror(err_msg);
 		free(err_msg);
 		return NULL;
 	}
-	while ((entry = readdir(proc)) != NULL) {
+	while ((entry = readdir(dir)) != NULL) {
 		if (!isdigit(*entry -> d_name)) {
 			continue;
 		}
@@ -144,7 +144,7 @@ int *scan_all_digital_directories(const char *path)
 		pid_array[array_count++] = pid;
 	}
 	pid_array[array_count] = -1;
-	closedir(proc);
+	closedir(dir);
 	return pid_array;
 }
 
@@ -277,6 +277,9 @@ char *get_status_file_field(const pid_t pid, const char *field)
 char *get_list_all_process_ids()
 {
 	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
+	if (pid_array == NULL) {
+		return "ERROR: FILE_NOT_FOUND";
+	}
 	return convert_int_array_to_char_array((int *)pid_array);
 }
 
@@ -285,6 +288,9 @@ char *get_thread_s_ids(const pid_t pid)
 	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
+	if (tid_array == NULL) {
+		return "ERROR: FILE_NOT_FOUND";
+	}
 	free(pid_task_path);
 	return convert_int_array_to_char_array((int *)tid_array);
 }
@@ -292,6 +298,9 @@ char *get_thread_s_ids(const pid_t pid)
 char *get_child_s_pids(const pid_t pid)
 {
 	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
+	if (pid_array == NULL) {
+		return "ERROR: FILE_NOT_FOUND";
+	}
 	pid_t *child_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
 	int pid_count = 0, child_count = 0;
 	char *tmp = (char *)calloc(ID_WIDTH, sizeof(char));
