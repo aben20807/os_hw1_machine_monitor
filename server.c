@@ -4,14 +4,14 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	// printf("%s\n", get_list_all_process_ids());      // (a
-	// printf("%s\n", get_thread_s_ids(1889));          // (b
-	// printf("%s\n", get_process_name(5));             // (d
-	// printf("%s\n", get_state_of_process(1));      // (e
-	// printf("%s\n", get_cmdline(718));                // (f
-	// printf("%s\n", get_parent_s_pid(1));           // (g
-	// printf("%s\n", get_virtual_memory_size(1));      // (i
-	// printf("%s\n", get_physical_memory_size(1));  // (j
+	printf("%s\n", get_list_all_process_ids());      // (a
+	printf("%s\n", get_thread_s_ids(2173));          // (b
+	printf("%s\n", get_process_name(5));             // (d
+	printf("%s\n", get_state_of_process(1));      // (e
+	printf("%s\n", get_cmdline(1));                // (f
+	printf("%s\n", get_parent_s_pid(1));           // (g
+	printf("%s\n", get_virtual_memory_size(1));      // (i
+	printf("%s\n", get_physical_memory_size(1));  // (j
 	printf("%s\n", get_child_s_pids(1));  // (j
 	printf("\nexit\n");
 	return 0;
@@ -204,7 +204,7 @@ void *connection_handler(void *client_sockfd)
 	return 0;
 }
 
-char *convert_int_array_to_char_array(const int *int_array)
+char *convert_int_array_to_char_array(int *int_array)
 {
 	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
 	int i = 0;
@@ -215,6 +215,7 @@ char *convert_int_array_to_char_array(const int *int_array)
 		free(tmp_pid);
 		i++;
 	}
+	free(int_array);
 	return result;
 }
 
@@ -280,6 +281,7 @@ char *get_thread_s_ids(const pid_t pid)
 	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
+	free(pid_task_path);
 	return convert_int_array_to_char_array((int *)tid_array);
 }
 
@@ -298,6 +300,7 @@ char *get_child_s_pids(const pid_t pid)
 	}
 	child_array[child_count] = -1;
 	free(tmp);
+	free(pid_array);
 	return convert_int_array_to_char_array(child_array);
 }
 
@@ -321,6 +324,7 @@ char *get_cmdline(const pid_t pid)
 {
 	FILE *fin;
 	if (!open_file(&fin, create_cmdline_path(pid))) {
+		return "ERROR: FILE_NOT_FOUND";
 	}
 	char *result = (char *)calloc(CMDLINE_SIZE, sizeof(char));
 	char c;

@@ -33,7 +33,7 @@ int *scan_all_digital_directories(const char *path);
 int create_server(const int port);
 void accept_client(const int sockfd);
 void *connection_handler(void *client_sockfd);
-char *convert_int_array_to_char_array(const int *int_array);
+char *convert_int_array_to_char_array(int *int_array);
 char *get_status_file_field(const pid_t pid, const char *field);
 
 char *get_process_info(char command);
