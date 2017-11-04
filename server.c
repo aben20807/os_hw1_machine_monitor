@@ -2,18 +2,18 @@
 
 int main(int argc, char **argv)
 {
-	// int sockfd = create_server(59487);
-	// accept_client(sockfd);
-	printf("a) %s\n", get_process_info('a', 0));
-	printf("b) %s\n", get_process_info('b', 1));
-	printf("c) %s\n", get_process_info('c', 1));
-	printf("d) %s\n", get_process_info('d', 5));
-	printf("e) %s\n", get_process_info('e', 1));
-	printf("f) %s\n", get_process_info('f', 1));
-	printf("g) %s\n", get_process_info('g', 1));
-	printf("h) %s\n", get_process_info('h', 5));
-	printf("i) %s\n", get_process_info('i', 1));
-	printf("j) %s\n", get_process_info('j', 1));
+	int sockfd = create_server(59487);
+	accept_client(sockfd);
+	// printf("a) %s\n", get_process_info('a', 0));
+	// printf("b) %s\n", get_process_info('b', 1));
+	// printf("c) %s\n", get_process_info('c', 1));
+	// printf("d) %s\n", get_process_info('d', 5));
+	// printf("e) %s\n", get_process_info('e', 1));
+	// printf("f) %s\n", get_process_info('f', 1));
+	// printf("g) %s\n", get_process_info('g', 1));
+	// printf("h) %s\n", get_process_info('h', 5));
+	// printf("i) %s\n", get_process_info('i', 1));
+	// printf("j) %s\n", get_process_info('j', 1));
 	// while (1) {
 	//     printf("which? ");
 	//     char command;

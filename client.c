@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv)
 {
+	print_interface();
 	int sockfd = create_client();
 	connect_to_server(sockfd, "127.0.0.1", 59487);
 	pthread_t thread_id;
@@ -9,8 +10,8 @@ int main(int argc, char **argv)
 	                   (void*)&sockfd) < 0) {
 		perror("could not create thread");
 	}
-	printf("Command-handler assigned\n");
-	fflush(stdout);
+	// printf("Command-handler assigned\n");
+	// fflush(stdout);
 	while (1) {}
 	printf("close Socket\n");
 	close(sockfd);
@@ -24,7 +25,7 @@ int create_client()
 	if (sockfd == -1) {
 		printf("Fail to create a socket.");
 	} else {
-		printf("Client started...\n");
+		// printf("Client started...\n");
 	}
 	fflush(stdout);
 	return sockfd;
@@ -48,8 +49,8 @@ void connect_to_server(const int sockfd, const char *server_addr,
 	                   (void*)&sockfd) < 0) {
 		perror("could not create thread");
 	}
-	printf("Handler assigned\n");
-	fflush(stdout);
+	// printf("Handler assigned\n");
+	// fflush(stdout);
 }
 
 void *send_command(void *server_sockfd)
@@ -86,12 +87,11 @@ void *connection_handler(void *server_sockfd)
 	int sockfd = *(int*)server_sockfd;
 	int read_size;
 	char input_buffer[BUFSIZ] = {};
-	// printf("%d", BUFSIZ);
 	fflush(stdout);
 	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
-		printf("Get: %s\n", input_buffer);
-		// fflush(stdout);
+		printf("%s\n", input_buffer);
+		fflush(stdout);
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
@@ -101,4 +101,22 @@ void *connection_handler(void *server_sockfd)
 		perror("recv failed");
 	}
 	return 0;
+}
+
+void print_interface()
+{
+	printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+	       "================================================",
+	       "(a)list all process ids",
+	       "(b)thread's IDs",
+	       "(c)child's PIDs",
+	       "(d)process name",
+	       "(e)state of process(D,R,S,T,t,W,X,Z)",
+	       "(f)command line of executing process(cmdline)",
+	       "(g)parent's PID",
+	       "(h)all ancients of PIDs",
+	       "(i)virtual memory size(VmSize)",
+	       "(j)physical memory size(VmRSS)",
+	       "(k)exit"
+	      );
 }
