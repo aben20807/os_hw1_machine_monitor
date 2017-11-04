@@ -11,6 +11,7 @@ int main(int argc, char **argv)
 	printf("e) %s\n", get_state_of_process(1));
 	printf("f) %s\n", get_cmdline(1));
 	printf("g) %s\n", get_parent_s_pid(1));
+	printf("h) %s\n", get_all_ancients_of_pids(5));
 	printf("i) %s\n", get_virtual_memory_size(1));
 	printf("j) %s\n", get_physical_memory_size(1));
 	printf("\nexit\n");
@@ -338,7 +339,27 @@ char *get_parent_s_pid(const pid_t pid)
 	return get_status_file_field(pid, "PPid");
 }
 
-// char *get_all_ancients_of_pids(const pid_t pid){}
+char *get_all_ancients_of_pids(const pid_t pid)
+{
+	pid_t tmp_pid = pid;
+	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	char *tmp_ppid;
+	int i = 0;
+	while (strcmp("0", tmp_ppid = get_status_file_field(tmp_pid, "PPid")) != 0) {
+		if (strcmp("ERROR: FILE_NOT_FOUND", tmp_ppid) == 0 ) {
+			return "ERROR: FILE_NOT_FOUND";
+		}
+		if (i > 0) {
+			strcat(result, " ");
+		}
+		strcat(result, tmp_ppid);
+		tmp_pid = atoi(tmp_ppid);
+		free(tmp_ppid);
+		i++;
+	}
+	strcat(result, (strlen(result) == 0) ? "0" : " 0"); // add 0 ppid
+	return result;
+}
 
 char *get_virtual_memory_size(const pid_t pid)
 {
