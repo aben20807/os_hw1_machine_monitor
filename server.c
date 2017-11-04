@@ -101,6 +101,10 @@ void split_key_value(const char *line, char **key, char **value)
 				// ignore white space and tab
 				continue;
 			}
+			if (strcmp(*key, "State") == 0 && count == 1) {
+				// store only first char if key is "State"
+				break;
+			}
 			(*value)[count++] = line[i];
 		}
 	}
@@ -311,13 +315,7 @@ char *get_process_name(const pid_t pid)
 
 char *get_state_of_process(const pid_t pid)
 {
-	char *tmp = (char *)calloc(VALUE_SIZE, sizeof(char));
-	strncpy(tmp, get_status_file_field(pid, "State"), VALUE_SIZE);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
-	result[0] = tmp[0];
-	result[1] = '\0';
-	free(tmp);
-	return result;
+	return get_status_file_field(pid, "State");
 }
 
 char *get_cmdline(const pid_t pid)
