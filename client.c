@@ -57,9 +57,23 @@ void *send_command(void *server_sockfd)
 	int sockfd = *(int*)server_sockfd;
 	char message[] = {"Hi there"};
 	while (1) {
-		char c;
-		scanf(" %c", &c);
-		sprintf(message, "%c", c);
+		char c = ' ';
+		int pid = 0;
+		printf("which? ");
+		if (!scanf(" %c", &c)) {
+			break;
+		} else if (c == 'k') {
+			close(sockfd);
+			break;
+		} else if (c > 'k') {
+			printf("ERROR: COMMAND_NOT_FOUND\n");
+			continue;
+		}
+		if (c != 'a') {
+			printf("pid? ");
+			scanf("%d", &pid);
+		}
+		sprintf(message, "%c%d", c, pid);
 		send(sockfd, message, sizeof(message), 0);
 	}
 }
@@ -69,6 +83,7 @@ void *connection_handler(void *server_sockfd)
 	int sockfd = *(int*)server_sockfd;
 	int read_size;
 	char input_buffer[BUFSIZ] = {};
+	fflush(stdout);
 	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
 		input_buffer[read_size] = '\0';
 		printf("Get: %s\n", input_buffer);

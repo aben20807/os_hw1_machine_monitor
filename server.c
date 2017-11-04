@@ -2,8 +2,8 @@
 
 int main(int argc, char **argv)
 {
-	// int sockfd = create_server(59487);
-	// accept_client(sockfd);
+	int sockfd = create_server(59487);
+	accept_client(sockfd);
 	// printf("a) %s\n", get_list_all_process_ids());
 	// printf("b) %s\n", get_thread_s_ids(2173));
 	// printf("c) %s\n", get_child_s_pids(1));
@@ -14,20 +14,20 @@ int main(int argc, char **argv)
 	// printf("h) %s\n", get_all_ancients_of_pids(5));
 	// printf("i) %s\n", get_virtual_memory_size(5));
 	// printf("j) %s\n", get_physical_memory_size(1));
-	while (1) {
-		printf("which? ");
-		char command;
-		scanf(" %c", &command);
-		if (command == 'k') {
-			break;
-		}
-		pid_t pid = 0;
-		if (command != 'a') {
-			printf("pid? ");
-			scanf("%d", &pid);
-		}
-		printf(">  %s\n", get_process_info(command, pid));
-	}
+	// while (1) {
+	//     printf("which? ");
+	//     char command;
+	//     scanf(" %c", &command);
+	//     if (command == 'k') {
+	//         break;
+	//     }
+	//     pid_t pid = 0;
+	//     if (command != 'a') {
+	//         printf("pid? ");
+	//         scanf("%d", &pid);
+	//     }
+	//     printf(">  %s\n", get_process_info(command, pid));
+	// }
 	printf("\nexit\n");
 	return 0;
 }
@@ -190,7 +190,7 @@ void accept_client(const int sockfd)
 	while ((1)) {
 		client_sockfd = accept(sockfd, (struct sockaddr*)&client_info, &addrlen);
 		printf("Accepted one\n");
-		send(client_sockfd, message, sizeof(message), 0);
+		// send(client_sockfd, message, sizeof(message), 0);
 		pthread_t thread_id;
 		if (pthread_create(&thread_id, NULL, connection_handler,
 		                   (void*)&client_sockfd) < 0) {
@@ -284,7 +284,7 @@ char *get_process_info(const char command, const pid_t pid)
 		return get_physical_memory_size(pid);
 		break;
 	default:
-		return "COMMAND_NOT_FOUND";
+		return "ERROR: COMMAND_NOT_FOUND";
 		break;
 	}
 }
