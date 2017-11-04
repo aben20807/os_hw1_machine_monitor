@@ -4,15 +4,15 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	printf("%s\n", get_list_all_process_ids());      // (a
-	printf("%s\n", get_thread_s_ids(2173));          // (b
-	printf("%s\n", get_process_name(5));             // (d
-	printf("%s\n", get_state_of_process(1));      // (e
-	printf("%s\n", get_cmdline(1));                // (f
-	printf("%s\n", get_parent_s_pid(1));           // (g
-	printf("%s\n", get_virtual_memory_size(1));      // (i
-	printf("%s\n", get_physical_memory_size(1));  // (j
-	printf("%s\n", get_child_s_pids(1));  // (j
+	printf("a) %s\n", get_list_all_process_ids());
+	printf("b) %s\n", get_thread_s_ids(2173));
+	printf("c) %s\n", get_child_s_pids(1));
+	printf("d) %s\n", get_process_name(5));
+	printf("e) %s\n", get_state_of_process(1));
+	printf("f) %s\n", get_cmdline(1));
+	printf("g) %s\n", get_parent_s_pid(1));
+	printf("i) %s\n", get_virtual_memory_size(1));
+	printf("j) %s\n", get_physical_memory_size(1));
 	printf("\nexit\n");
 	return 0;
 }
@@ -49,7 +49,6 @@ map create_status_map(FILE *fin)
 	char line_buffer[BUFSIZ]; // BUFSIZ is defined in stdio.h
 	int line_number = 0;
 	while (fgets(line_buffer, sizeof(line_buffer), fin)) {
-		// printf("%4d: %s", line_number, line_buffer);
 		char *key, *value;
 		split_key_value(line_buffer, &key, &value);
 		if (line_number != 0) {
