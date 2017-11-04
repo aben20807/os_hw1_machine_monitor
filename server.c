@@ -4,16 +4,30 @@ int main(int argc, char **argv)
 {
 	// int sockfd = create_server(59487);
 	// accept_client(sockfd);
-	printf("a) %s\n", get_list_all_process_ids());
-	printf("b) %s\n", get_thread_s_ids(2173));
-	printf("c) %s\n", get_child_s_pids(1));
-	printf("d) %s\n", get_process_name(5));
-	printf("e) %s\n", get_state_of_process(1));
-	printf("f) %s\n", get_cmdline(1));
-	printf("g) %s\n", get_parent_s_pid(1));
-	printf("h) %s\n", get_all_ancients_of_pids(5));
-	printf("i) %s\n", get_virtual_memory_size(5));
-	printf("j) %s\n", get_physical_memory_size(1));
+	// printf("a) %s\n", get_list_all_process_ids());
+	// printf("b) %s\n", get_thread_s_ids(2173));
+	// printf("c) %s\n", get_child_s_pids(1));
+	// printf("d) %s\n", get_process_name(5));
+	// printf("e) %s\n", get_state_of_process(1));
+	// printf("f) %s\n", get_cmdline(1));
+	// printf("g) %s\n", get_parent_s_pid(1));
+	// printf("h) %s\n", get_all_ancients_of_pids(5));
+	// printf("i) %s\n", get_virtual_memory_size(5));
+	// printf("j) %s\n", get_physical_memory_size(1));
+	while (1) {
+		printf("which? ");
+		char command;
+		scanf(" %c", &command);
+		if (command == 'k') {
+			break;
+		}
+		pid_t pid = 0;
+		if (command != 'a') {
+			printf("pid? ");
+			scanf("%d", &pid);
+		}
+		printf(">  %s\n", get_process_info(command, pid));
+	}
 	printf("\nexit\n");
 	return 0;
 }
@@ -236,43 +250,44 @@ char *get_status_file_field(const pid_t pid, const char *field)
 	return result;
 }
 
-/*char *get_process_info(char command)
-  {
-  switch (command) {
-  case 'a':
-  return get_list_all_process_ids();
-  break;
-  case 'b':
-  return get_thread_s_ids();
-  break;
-  case 'c':
-  return get_child_s_pids();
-  break;
-  case 'd':
-  return get_process_name();
-  break;
-  case 'e':
-  return get_state_of_process();
-  break;
-  case 'f':
-  return get_cmdline();
-  break;
-  case 'g':
-  return get_parent_s_pid();
-  break;
-  case 'h':
-  return get_all_ancients_of_pids();
-  break;
-  case 'i':
-  return get_virtual_memory_size();
-  break;
-  case 'j':
-  return get_physical_memory_size();
-  break;
-  default:
-  break;
-  }
-  }*/
+char *get_process_info(const char command, const pid_t pid)
+{
+	switch (command) {
+	case 'a':
+		return get_list_all_process_ids();
+		break;
+	case 'b':
+		return get_thread_s_ids(pid);
+		break;
+	case 'c':
+		return get_child_s_pids(pid);
+		break;
+	case 'd':
+		return get_process_name(pid);
+		break;
+	case 'e':
+		return get_state_of_process(pid);
+		break;
+	case 'f':
+		return get_cmdline(pid);
+		break;
+	case 'g':
+		return get_parent_s_pid(pid);
+		break;
+	case 'h':
+		return get_all_ancients_of_pids(pid);
+		break;
+	case 'i':
+		return get_virtual_memory_size(pid);
+		break;
+	case 'j':
+		return get_physical_memory_size(pid);
+		break;
+	default:
+		return "COMMAND_NOT_FOUND";
+		break;
+	}
+}
 
 char *get_list_all_process_ids()
 {

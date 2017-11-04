@@ -36,7 +36,7 @@ void *connection_handler(void *client_sockfd);
 char *convert_int_array_to_char_array(int *int_array);
 char *get_status_file_field(const pid_t pid, const char *field);
 
-char *get_process_info(char command);
+char *get_process_info(const char command, const pid_t pid);
 char *get_list_all_process_ids();
 char *get_thread_s_ids(const pid_t pid);
 char *get_child_s_pids(const pid_t pid);
