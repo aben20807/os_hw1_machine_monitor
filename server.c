@@ -331,7 +331,11 @@ char *get_cmdline(const pid_t pid)
 		result[count++] = c;
 	}
 	fclose(fin);
-	return result;
+	if (strlen(result) == 0) {
+		return "(nothing in the cmdline)";
+	} else {
+		return result;
+	}
 }
 
 char *get_parent_s_pid(const pid_t pid)
