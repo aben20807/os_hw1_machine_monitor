@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-int create_client()
+static inline int create_client()
 {
 	int sockfd = 0;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -23,8 +23,8 @@ int create_client()
 	return sockfd;
 }
 
-void connect_to_server(const int sockfd, const char *server_addr,
-                       const int port)
+static inline void connect_to_server(const int sockfd, const char *server_addr,
+                                     const int port)
 {
 	struct sockaddr_in info;
 	memset(&info, 0, sizeof(info));
@@ -39,9 +39,9 @@ void connect_to_server(const int sockfd, const char *server_addr,
 	}
 }
 
-void send_command(int sockfd)
+static inline void send_command(const int sockfd)
 {
-	while (1) {
+	while (true) {
 		print_interface();
 		char c = ' ';
 		int pid = 0;
@@ -69,7 +69,7 @@ void send_command(int sockfd)
 	}
 }
 
-void print_receive_info(int sockfd)
+static inline void print_receive_info(const int sockfd)
 {
 	int read_size;
 	struct monitor_protocol package;
@@ -86,7 +86,7 @@ void print_receive_info(int sockfd)
 	}
 }
 
-void print_interface()
+static inline void print_interface()
 {
 	printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 	       "================================================",

@@ -4,35 +4,11 @@ int main(int argc, char **argv)
 {
 	int sockfd = create_server(59487);
 	accept_client(sockfd);
-	// printf("a) %s\n", get_process_info('a', 0));
-	// printf("b) %s\n", get_process_info('b', 1));
-	// printf("c) %s\n", get_process_info('c', 1));
-	// printf("d) %s\n", get_process_info('d', 5));
-	// printf("e) %s\n", get_process_info('e', 1));
-	// printf("f) %s\n", get_process_info('f', 1));
-	// printf("g) %s\n", get_process_info('g', 1));
-	// printf("h) %s\n", get_process_info('h', 5));
-	// printf("i) %s\n", get_process_info('i', 1));
-	// printf("j) %s\n", get_process_info('j', 1));
-	// while (1) {
-	//     printf("which? ");
-	//     char command;
-	//     scanf(" %c", &command);
-	//     if (command == 'k') {
-	//         break;
-	//     }
-	//     pid_t pid = 0;
-	//     if (command != 'a') {
-	//         printf("pid? ");
-	//         scanf("%d", &pid);
-	//     }
-	//     printf(">  %s\n", get_process_info(command, pid));
-	// }
 	printf("\nexit\n");
 	return 0;
 }
 
-int open_file(FILE **fin, const char *file_name)
+static inline int open_file(FILE **fin, const char *file_name)
 {
 	if (!(*fin = fopen(file_name, "r"))) {
 		perror(file_name);
@@ -42,7 +18,7 @@ int open_file(FILE **fin, const char *file_name)
 	}
 }
 
-char *create_status_path(const pid_t pid)
+static inline char *create_status_path(const pid_t pid)
 {
 	char *path = NULL;
 	MALLOC(path, sizeof(char) * PATH_SIZE);
@@ -50,7 +26,7 @@ char *create_status_path(const pid_t pid)
 	return path;
 }
 
-char *create_cmdline_path(const pid_t pid)
+static inline char *create_cmdline_path(const pid_t pid)
 {
 	char *path = NULL;
 	MALLOC(path, sizeof(char) * PATH_SIZE);
@@ -58,7 +34,7 @@ char *create_cmdline_path(const pid_t pid)
 	return path;
 }
 
-map create_status_map(FILE *fin)
+static inline map create_status_map(FILE *fin)
 {
 	map status_map = NULL;
 	MALLOC(status_map, sizeof(status_map));
@@ -82,7 +58,7 @@ map create_status_map(FILE *fin)
 	return status_map;
 }
 
-void delete_map(const map m)
+static inline void delete_map(const map m)
 {
 	element_ptr curr_ptr = m;
 	while (curr_ptr != NULL) {
@@ -94,12 +70,12 @@ void delete_map(const map m)
 	}
 }
 
-void split_key_value(const char *line, char **key, char **value)
+/*
+ * Split input line into two parts: key and value for map elements
+ * Example: "Name:   init" -> "Name"(key), "init"(value)
+ */
+static inline void split_key_value(const char *line, char **key, char **value)
 {
-	/*
-	   Split input line into two parts: key and value
-	   Example: Name:   init -> Name(key), init(value)
-	   */
 	CALLOC(*key, KEY_SIZE, sizeof(char));
 	CALLOC(*value, VALUE_SIZE, sizeof(char));
 	bool is_colon_appear = false;
@@ -126,7 +102,7 @@ void split_key_value(const char *line, char **key, char **value)
 	}
 }
 
-char* search_value(const map status_map, const char* key)
+static inline char* search_value(const map status_map, const char* key)
 {
 	element_ptr curr_ptr = status_map;
 	while (curr_ptr != NULL) {
@@ -138,14 +114,9 @@ char* search_value(const map status_map, const char* key)
 	return "ERROR: FIELD_NOT_FOUND";
 }
 
-int *scan_all_digital_directories(const char *path)
+static inline int *scan_all_digital_dir(const char *path)
 {
 	DIR *dir = opendir(path);
-	struct dirent *entry;
-	pid_t *pid_array = NULL;
-	CALLOC(pid_array, PROC_NUM, sizeof(pid_t));
-	int array_count = 0;
-	pid_t pid;
 	if (dir == NULL) {
 		char *err_msg = NULL;
 		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
@@ -154,19 +125,24 @@ int *scan_all_digital_directories(const char *path)
 		free(err_msg);
 		return NULL;
 	}
+	struct dirent *entry;
+	pid_t *pid_list = NULL;
+	CALLOC(pid_list, PROC_NUM, sizeof(pid_t));
+	pid_t pid;
+	int count = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (!isdigit(*entry -> d_name)) {
 			continue;
 		}
-		pid = strtol(entry -> d_name, NULL, 10);
-		pid_array[array_count++] = pid;
+		pid = strtol(entry -> d_name, NULL, ID_WIDTH);
+		pid_list[count++] = pid;
 	}
-	pid_array[array_count] = -1;
+	pid_list[count] = -1;
 	closedir(dir);
-	return pid_array;
+	return pid_list;
 }
 
-int create_server(const int port)
+static inline int create_server(const int port)
 {
 	int sockfd = 0;
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -185,12 +161,12 @@ int create_server(const int port)
 	return sockfd;
 }
 
-void accept_client(const int sockfd)
+static inline void accept_client(const int sockfd)
 {
 	int client_sockfd = 0;
 	struct sockaddr_in client_info;
 	socklen_t addrlen = sizeof(client_info);
-	while ((1)) {
+	while (true) {
 		client_sockfd = accept(sockfd, (struct sockaddr*)&client_info, &addrlen);
 		printf("Accepted one\n");
 		pthread_t thread_id;
@@ -203,7 +179,7 @@ void accept_client(const int sockfd)
 	}
 }
 
-void *connection_handler(void *client_sockfd)
+static void *connection_handler(void *client_sockfd)
 {
 	int sockfd = *(int*)client_sockfd;
 	int read_size;
@@ -227,7 +203,7 @@ void *connection_handler(void *client_sockfd)
 	return 0;
 }
 
-char *convert_int_array_to_char_array(int *int_array)
+static inline char *convert_int_array_to_string(int *int_array)
 {
 	char *result = NULL;
 	CALLOC(result, LIST_CHAR_LENGTH, sizeof(char));
@@ -244,7 +220,7 @@ char *convert_int_array_to_char_array(int *int_array)
 	return result;
 }
 
-char *get_status_file_field(const pid_t pid, const char *field)
+static char *get_status_file_field(const pid_t pid, const char *field)
 {
 	FILE *fin;
 	if (!open_file(&fin, create_status_path(pid))) {
@@ -258,7 +234,7 @@ char *get_status_file_field(const pid_t pid, const char *field)
 	return result;
 }
 
-char *get_process_info(const char command, const pid_t pid)
+static inline char *get_process_info(const char command, const pid_t pid)
 {
 	switch (command) {
 	case 'a':
@@ -297,7 +273,7 @@ char *get_process_info(const char command, const pid_t pid)
 	}
 }
 
-char *get_process_description(const char command)
+static inline char *get_process_description(const char command)
 {
 	switch (command) {
 	case 'a':
@@ -336,32 +312,32 @@ char *get_process_description(const char command)
 	}
 }
 
-char *get_list_all_process_ids()
+static inline char *get_list_all_process_ids()
 {
-	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
-	if (pid_array == NULL) {
+	pid_t *pid_list = (pid_t *)scan_all_digital_dir("/proc");
+	if (pid_list == NULL) {
 		return "ERROR: FILE_NOT_FOUND";
 	}
-	return convert_int_array_to_char_array((int *)pid_array);
+	return convert_int_array_to_string((int *)pid_list);
 }
 
-char *get_thread_s_ids(const pid_t pid)
+static inline char *get_thread_s_ids(const pid_t pid)
 {
 	char *pid_task_path = NULL;
 	MALLOC(pid_task_path, sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
-	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
+	tid_t *tid_array = (pid_t *)scan_all_digital_dir(pid_task_path);
 	if (tid_array == NULL) {
 		return "ERROR: FILE_NOT_FOUND";
 	}
 	free(pid_task_path);
-	return convert_int_array_to_char_array((int *)tid_array);
+	return convert_int_array_to_string((int *)tid_array);
 }
 
-char *get_child_s_pids(const pid_t pid)
+static inline char *get_child_s_pids(const pid_t pid)
 {
-	pid_t *pid_array = (pid_t *)scan_all_digital_directories("/proc");
-	if (pid_array == NULL) {
+	pid_t *pid_list = (pid_t *)scan_all_digital_dir("/proc");
+	if (pid_list == NULL) {
 		return "ERROR: FILE_NOT_FOUND";
 	}
 	pid_t *children_list = NULL;
@@ -370,20 +346,20 @@ char *get_child_s_pids(const pid_t pid)
 	CALLOC(tmp_child, ID_WIDTH, sizeof(char));
 	int pid_count = 0, child_count = 0;
 	snprintf(tmp_child, ID_WIDTH, "%d", pid);
-	while (pid_array[pid_count] != -1) {
-		if (strcmp(tmp_child, get_status_file_field(pid_array[pid_count],
+	while (pid_list[pid_count] != -1) {
+		if (strcmp(tmp_child, get_status_file_field(pid_list[pid_count],
 		           "PPid")) == 0) {
-			children_list[child_count++] = pid_array[pid_count];
+			children_list[child_count++] = pid_list[pid_count];
 		}
 		pid_count++;
 	}
 	children_list[child_count] = -1;
 	free(tmp_child);
-	free(pid_array);
-	return convert_int_array_to_char_array(children_list);
+	free(pid_list);
+	return convert_int_array_to_string(children_list);
 }
 
-char *get_cmdline(const pid_t pid)
+static inline char *get_cmdline(const pid_t pid)
 {
 	FILE *fin;
 	if (!open_file(&fin, create_cmdline_path(pid))) {
@@ -404,7 +380,7 @@ char *get_cmdline(const pid_t pid)
 	}
 }
 
-char *get_all_ancients_of_pids(const pid_t pid)
+static inline char *get_all_ancients_of_pids(const pid_t pid)
 {
 	pid_t tmp_pid = pid;
 	char *result = NULL;

@@ -3,11 +3,11 @@
 
 #include "protocol.h"
 
-int create_client();
-void connect_to_server(const int sockfd, const char *server_addr,
-                       const int port);
-void send_command(int sockfd);
-void print_receive_info(int sockfd);
-void print_interface();
+static inline int create_client();
+static inline void connect_to_server(const int sockfd, const char *server_addr,
+                                     const int port);
+static inline void send_command(const int sockfd);
+static inline void print_receive_info(const int sockfd);
+static inline void print_interface();
 
 #endif
