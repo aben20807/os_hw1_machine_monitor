@@ -35,6 +35,7 @@ void connect_to_server(const int sockfd, const char *server_addr,
 	if (err == -1) {
 		printf("Connection error\n");
 		fflush(stdout);
+		exit(EXIT_FAILURE);
 	}
 }
 

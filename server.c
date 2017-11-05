@@ -210,13 +210,13 @@ void *connection_handler(void *client_sockfd)
 	struct monitor_protocol package;
 	while ((read_size = recv(sockfd, &package, sizeof(package), 0)) > 0 ) {
 		printf("From %d Get: %c %d\n", sockfd, package.command, package.pid);
-		char command = package.command;
-		pid_t pid = package.pid;
-		strncpy(package.description, get_process_description(command),
-		        DESCRIPTION_SIZE);
-		strncpy(package.info, get_process_info(command, pid), BUFSIZ);
+		char *desc = get_process_description(package.command);
+		char *info = get_process_info(package.command, package.pid);
+		strncpy(package.description, desc, DESCRIPTION_SIZE);
+		strncpy(package.info, info, BUFSIZ);
 		send(sockfd, &package, sizeof(package), 0);
 		fflush(stdout);
+		free(info);
 	}
 	if (read_size == 0) {
 		printf("Client disconnected\n");
