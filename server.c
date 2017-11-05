@@ -203,22 +203,27 @@ void *connection_handler(void *client_sockfd)
 {
 	int sockfd = *(int*)client_sockfd;
 	int read_size;
-	char input_buffer[BUFSIZ] = {};
-	while ((read_size = recv(sockfd, input_buffer, sizeof(input_buffer), 0)) > 0 ) {
-		input_buffer[read_size] = '\0';
-		printf("From %d Get: %s\n", sockfd, input_buffer);
-		char command = input_buffer[0];
-		input_buffer[0] = '0';
-		pid_t pid = atoi(input_buffer);
+	// char input_buffer[BUFSIZ] = {};
+	struct monitor_protocol package;
+	while ((read_size = recv(sockfd, &package, sizeof(package), 0)) > 0 ) {
+		// input_buffer[read_size] = '\0';
+		printf("From %d Get: %c %d\n", sockfd, package.command, package.pid);
+		char command = package.command;
+		// char command = package[0];
+		// input_buffer[0] = '0';
+		pid_t pid = package.pid;
+		// pid_t pid = atoi(input_buffer);
 		// char output_buffer[BUFSIZ];// = {"Hi,this is server.\n"};
 		// strncpy(output_buffer, get_process_info(command, pid), BUFSIZ);
 		// send(sockfd, output_buffer, sizeof(output_buffer), 0);
-		struct monitor_protocol package;
+		// struct monitor_protocol package;
 		// mp.num = 1;
+		strncpy(package.description, get_process_description(command),
+		        DESCRIPTION_SIZE);
 		strncpy(package.info, get_process_info(command, pid), BUFSIZ);
 		send(sockfd, &package, sizeof(package), 0);
 		fflush(stdout);
-		memset(input_buffer, 0, sizeof(input_buffer));
+		// memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
 		printf("Client disconnected\n");
@@ -292,6 +297,45 @@ char *get_process_info(const char command, const pid_t pid)
 		break;
 	default:
 		return "ERROR: COMMAND_NOT_FOUND";
+		break;
+	}
+}
+
+char *get_process_description(const char command)
+{
+	switch (command) {
+	case 'a':
+		return "[all processes ids]";
+		break;
+	case 'b':
+		return "[tid]";
+		break;
+	case 'c':
+		return "[children pids]";
+		break;
+	case 'd':
+		return "[process name]";
+		break;
+	case 'e':
+		return "[process state]";
+		break;
+	case 'f':
+		return "[command line]";
+		break;
+	case 'g':
+		return "[parent's pid]";
+		break;
+	case 'h':
+		return "[ancients' pids]";
+		break;
+	case 'i':
+		return "[virtual memory]";
+		break;
+	case 'j':
+		return "[physical memory]";
+		break;
+	default:
+		return "";
 		break;
 	}
 }
