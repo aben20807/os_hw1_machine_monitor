@@ -44,14 +44,16 @@ int open_file(FILE **fin, const char *file_name)
 
 char *create_status_path(const pid_t pid)
 {
-	char *path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	char *path = NULL;
+	MALLOC(path, sizeof(char) * PATH_SIZE);
 	snprintf(path, PATH_SIZE, "/proc/%d/status", pid);
 	return path;
 }
 
 char *create_cmdline_path(const pid_t pid)
 {
-	char *path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	char *path = NULL;
+	MALLOC(path, sizeof(char) * PATH_SIZE);
 	snprintf(path, PATH_SIZE, "/proc/%d/cmdline", pid);
 	return path;
 }
@@ -98,8 +100,8 @@ void split_key_value(const char *line, char **key, char **value)
 	   Split input line into two parts: key and value
 	   Example: Name:   init -> Name(key), init(value)
 	   */
-	*key = (char *) calloc(KEY_SIZE, sizeof(char));
-	*value = (char *) calloc(VALUE_SIZE, sizeof(char));
+	CALLOC(*key, KEY_SIZE, sizeof(char));
+	CALLOC(*value, VALUE_SIZE, sizeof(char));
 	bool is_colon_appear = false;
 	int count = 0;
 	for (int i = 0; i < strlen(line); i++) {
@@ -140,11 +142,13 @@ int *scan_all_digital_directories(const char *path)
 {
 	DIR *dir = opendir(path);
 	struct dirent *entry;
-	pid_t *pid_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
+	pid_t *pid_array = NULL;
+	CALLOC(pid_array, PROC_NUM, sizeof(pid_t));
 	int array_count = 0;
 	pid_t pid;
 	if (dir == NULL) {
-		char *err_msg = (char *)calloc(ERRMSG_SIZE, sizeof(char));
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
 		sprintf(err_msg, "opendir(%s)", path);
 		perror(err_msg);
 		free(err_msg);
@@ -203,27 +207,16 @@ void *connection_handler(void *client_sockfd)
 {
 	int sockfd = *(int*)client_sockfd;
 	int read_size;
-	// char input_buffer[BUFSIZ] = {};
 	struct monitor_protocol package;
 	while ((read_size = recv(sockfd, &package, sizeof(package), 0)) > 0 ) {
-		// input_buffer[read_size] = '\0';
 		printf("From %d Get: %c %d\n", sockfd, package.command, package.pid);
 		char command = package.command;
-		// char command = package[0];
-		// input_buffer[0] = '0';
 		pid_t pid = package.pid;
-		// pid_t pid = atoi(input_buffer);
-		// char output_buffer[BUFSIZ];// = {"Hi,this is server.\n"};
-		// strncpy(output_buffer, get_process_info(command, pid), BUFSIZ);
-		// send(sockfd, output_buffer, sizeof(output_buffer), 0);
-		// struct monitor_protocol package;
-		// mp.num = 1;
 		strncpy(package.description, get_process_description(command),
 		        DESCRIPTION_SIZE);
 		strncpy(package.info, get_process_info(command, pid), BUFSIZ);
 		send(sockfd, &package, sizeof(package), 0);
 		fflush(stdout);
-		// memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
 		printf("Client disconnected\n");
@@ -236,11 +229,13 @@ void *connection_handler(void *client_sockfd)
 
 char *convert_int_array_to_char_array(int *int_array)
 {
-	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	char *result = NULL;
+	CALLOC(result, LIST_CHAR_LENGTH, sizeof(char));
 	int i = 0;
 	while (int_array[i] != -1) {
-		char *tmp_pid = (char *)calloc(8, sizeof(char));
-		snprintf(tmp_pid, 8, (i == 0) ? "%d" : " %d", int_array[i]);
+		char *tmp_pid = NULL;
+		CALLOC(tmp_pid, ID_WIDTH, sizeof(char));
+		snprintf(tmp_pid, ID_WIDTH, (i == 0) ? "%d" : " %d", int_array[i]);
 		strcat(result, tmp_pid);
 		free(tmp_pid);
 		i++;
@@ -256,7 +251,8 @@ char *get_status_file_field(const pid_t pid, const char *field)
 		return "ERROR: FILE_NOT_FOUND";
 	}
 	map status_map = create_status_map(fin);
-	char *result = (char *)calloc(VALUE_SIZE, sizeof(char));
+	char *result = NULL;
+	CALLOC(result, VALUE_SIZE, sizeof(char));
 	strncpy(result, search_value(status_map, field), VALUE_SIZE);
 	delete_map(status_map);
 	return result;
@@ -351,7 +347,8 @@ char *get_list_all_process_ids()
 
 char *get_thread_s_ids(const pid_t pid)
 {
-	char *pid_task_path = (char *) malloc(sizeof(char) * PATH_SIZE);
+	char *pid_task_path = NULL;
+	MALLOC(pid_task_path, sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
 	tid_t *tid_array = (pid_t *)scan_all_digital_directories(pid_task_path);
 	if (tid_array == NULL) {
@@ -367,20 +364,23 @@ char *get_child_s_pids(const pid_t pid)
 	if (pid_array == NULL) {
 		return "ERROR: FILE_NOT_FOUND";
 	}
-	pid_t *child_array = (pid_t *)calloc(PROC_NUM, sizeof(pid_t));
+	pid_t *children_list = NULL;
+	CALLOC(children_list, PROC_NUM, sizeof(pid_t));
+	char *tmp_child = NULL;
+	CALLOC(tmp_child, ID_WIDTH, sizeof(char));
 	int pid_count = 0, child_count = 0;
-	char *tmp = (char *)calloc(ID_WIDTH, sizeof(char));
-	snprintf(tmp, ID_WIDTH, "%d", pid);
+	snprintf(tmp_child, ID_WIDTH, "%d", pid);
 	while (pid_array[pid_count] != -1) {
-		if (strcmp(tmp, get_status_file_field(pid_array[pid_count], "PPid")) == 0) {
-			child_array[child_count++] = pid_array[pid_count];
+		if (strcmp(tmp_child, get_status_file_field(pid_array[pid_count],
+		           "PPid")) == 0) {
+			children_list[child_count++] = pid_array[pid_count];
 		}
 		pid_count++;
 	}
-	child_array[child_count] = -1;
-	free(tmp);
+	children_list[child_count] = -1;
+	free(tmp_child);
 	free(pid_array);
-	return convert_int_array_to_char_array(child_array);
+	return convert_int_array_to_char_array(children_list);
 }
 
 char *get_cmdline(const pid_t pid)
@@ -389,7 +389,8 @@ char *get_cmdline(const pid_t pid)
 	if (!open_file(&fin, create_cmdline_path(pid))) {
 		return "ERROR: FILE_NOT_FOUND";
 	}
-	char *result = (char *)calloc(CMDLINE_SIZE, sizeof(char));
+	char *result = NULL;
+	CALLOC(result, CMDLINE_SIZE, sizeof(char));
 	char c;
 	int count = 0;
 	while ((c = fgetc(fin)) != EOF) { //read all char until end of file
@@ -406,7 +407,8 @@ char *get_cmdline(const pid_t pid)
 char *get_all_ancients_of_pids(const pid_t pid)
 {
 	pid_t tmp_pid = pid;
-	char *result = (char *)calloc(LIST_CHAR_LENGTH, sizeof(char));
+	char *result = NULL;
+	CALLOC(result, LIST_CHAR_LENGTH, sizeof(char));
 	char *tmp_ppid;
 	int i = 0;
 	while (strcmp("0", tmp_ppid = get_status_file_field(tmp_pid, "PPid")) != 0) {

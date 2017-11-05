@@ -16,19 +16,13 @@
 
 #define DESCRIPTION_SIZE 20
 
-#define MALLOC(p, s) \
-	if(!((p) = malloc(s))){ \
-		fprintf(stderr, "insufficient memory"); \
-		exit(EXIT_FAILURE); \
-	}
-
-// #pragma pack(1)
+#pragma pack(1)
 struct monitor_protocol {
 	char command;
 	pid_t pid;
 	char description[DESCRIPTION_SIZE];
 	char info[BUFSIZ];
 };
-// #pragma pack(0)
+#pragma pack(0)
 
 #endif

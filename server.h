@@ -12,6 +12,18 @@
 #define PROC_NUM 300
 #define LIST_CHAR_LENGTH 1000
 
+#define MALLOC(p, s) \
+	if(!((p) = malloc(s))){ \
+		fprintf(stderr, "insufficient memory"); \
+		exit(EXIT_FAILURE); \
+	}
+#define CALLOC(p, l, s) \
+	if(!((p) = calloc(l, s))){ \
+		fprintf(stderr, "insufficient memory"); \
+		exit(EXIT_FAILURE); \
+	}
+
+
 typedef int tid_t;
 
 typedef struct Element *element_ptr;

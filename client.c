@@ -40,7 +40,6 @@ void connect_to_server(const int sockfd, const char *server_addr,
 
 void send_command(int sockfd)
 {
-	// char message[] = {"Hi there"};
 	while (1) {
 		print_interface();
 		char c = ' ';
@@ -61,7 +60,6 @@ void send_command(int sockfd)
 				printf("ERROR: input pid");
 			}
 		}
-		// sprintf(message, "%c%d", c, pid);
 		struct monitor_protocol package;
 		package.command = c;
 		package.pid = pid;
@@ -74,14 +72,10 @@ void print_receive_info(int sockfd)
 {
 	int read_size;
 	struct monitor_protocol package;
-	// char input_buffer[BUFSIZ] = {};
 	fflush(stdout);
 	if ((read_size = recv(sockfd, &package, sizeof(package), 0)) > 0 ) {
-		// input_buffer[read_size] = '\0';
-		// printf("\n%s\n\n", input_buffer.description);
 		printf("\n%s %s\n\n", package.description, package.info);
 		fflush(stdout);
-		// memset(input_buffer, 0, sizeof(input_buffer));
 	}
 	if (read_size == 0) {
 		printf("Client disconnected");
