@@ -15,7 +15,7 @@ static inline int create_client()
 	int sockfd = 0;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1) {
-		printf("Fail to create a socket.");
+		printf("Fail to create a socket.\n");
 	} else {
 		// printf("Client started...\n");
 	}
@@ -43,26 +43,30 @@ static inline void send_command(const int sockfd)
 {
 	while (true) {
 		print_interface();
-		char c = ' ';
+		char command = ' ';
 		int pid = 0;
 		printf("which? ");
-		if (!scanf(" %c", &c)) {
+		if (!scanf(" %c", &command)) {
 			break;
-		} else if (c == 'k') {
+		} else if (command == 'k') {
 			close(sockfd);
 			break;
-		} else if (c > 'k') {
+		} else if (command > 'k' || command < 'a') {
 			printf("ERROR: COMMAND_NOT_FOUND\n");
 			continue;
 		}
-		if (c != 'a') {
+		if (command != 'a') {
 			printf("pid? ");
 			if (!scanf("%d", &pid)) {
-				printf("ERROR: input pid");
+				break;
+			}
+			if (isdigit(pid)) {
+				printf("ERROR: input pid\n");
+				continue;
 			}
 		}
 		struct monitor_protocol package;
-		package.command = c;
+		package.command = command;
 		package.pid = pid;
 		send(sockfd, &package, sizeof(package), 0);
 		print_receive_info(sockfd);
@@ -79,7 +83,7 @@ static inline void print_receive_info(const int sockfd)
 		fflush(stdout);
 	}
 	if (read_size == 0) {
-		printf("Client disconnected");
+		printf("Client disconnected\n");
 		fflush(stdout);
 	} else if (read_size == -1) {
 		perror("recv failed");
