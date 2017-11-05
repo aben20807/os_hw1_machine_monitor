@@ -210,9 +210,13 @@ void *connection_handler(void *client_sockfd)
 		char command = input_buffer[0];
 		input_buffer[0] = '0';
 		pid_t pid = atoi(input_buffer);
-		char output_buffer[BUFSIZ];// = {"Hi,this is server.\n"};
-		strncpy(output_buffer, get_process_info(command, pid), BUFSIZ);
-		send(sockfd, output_buffer, sizeof(output_buffer), 0);
+		// char output_buffer[BUFSIZ];// = {"Hi,this is server.\n"};
+		// strncpy(output_buffer, get_process_info(command, pid), BUFSIZ);
+		// send(sockfd, output_buffer, sizeof(output_buffer), 0);
+		struct monitor_protocol package;
+		// mp.num = 1;
+		strncpy(package.info, get_process_info(command, pid), BUFSIZ);
+		send(sockfd, &package, sizeof(package), 0);
 		fflush(stdout);
 		memset(input_buffer, 0, sizeof(input_buffer));
 	}
