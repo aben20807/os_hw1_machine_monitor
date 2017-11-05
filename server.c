@@ -222,15 +222,21 @@ static inline char *convert_int_array_to_string(int *int_array)
 
 static char *get_status_file_field(const pid_t pid, const char *field)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_status_path(pid))) {
-		return "ERROR: FILE_NOT_FOUND";
+	FILE *fin = NULL;
+	char *path = create_status_path(pid);
+	if (!open_file(&fin, path)) {
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+		free(path);
+		return err_msg;
 	}
-	map status_map = create_status_map(fin);
 	char *result = NULL;
 	CALLOC(result, VALUE_SIZE, sizeof(char));
+	map status_map = create_status_map(fin);
 	strncpy(result, search_value(status_map, field), VALUE_SIZE);
 	delete_map(status_map);
+	free(path);
 	return result;
 }
 
@@ -239,37 +245,30 @@ static inline char *get_process_info(const char command, const pid_t pid)
 	switch (command) {
 	case 'a':
 		return get_list_all_process_ids();
-		break;
 	case 'b':
 		return get_thread_s_ids(pid);
-		break;
 	case 'c':
 		return get_child_s_pids(pid);
-		break;
 	case 'd':
 		return get_status_file_field(pid, "Name");
-		break;
 	case 'e':
 		return get_status_file_field(pid, "State");
-		break;
 	case 'f':
 		return get_cmdline(pid);
-		break;
 	case 'g':
 		return get_status_file_field(pid, "PPid");
-		break;
 	case 'h':
 		return get_all_ancients_of_pids(pid);
-		break;
 	case 'i':
 		return get_status_file_field(pid, "VmSize");
-		break;
 	case 'j':
 		return get_status_file_field(pid, "VmRSS");
-		break;
-	default:
-		return "ERROR: COMMAND_NOT_FOUND";
-		break;
+	default: {
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: COMMAND_NOT_FOUND", ERRMSG_SIZE);
+		return err_msg;
+	}
 	}
 }
 
@@ -278,37 +277,26 @@ static inline char *get_process_description(const char command)
 	switch (command) {
 	case 'a':
 		return "[all processes ids]";
-		break;
 	case 'b':
 		return "[tid]";
-		break;
 	case 'c':
 		return "[children pids]";
-		break;
 	case 'd':
 		return "[process name]";
-		break;
 	case 'e':
 		return "[process state]";
-		break;
 	case 'f':
 		return "[command line]";
-		break;
 	case 'g':
 		return "[parent's pid]";
-		break;
 	case 'h':
 		return "[ancients' pids]";
-		break;
 	case 'i':
 		return "[virtual memory]";
-		break;
 	case 'j':
 		return "[physical memory]";
-		break;
 	default:
 		return "";
-		break;
 	}
 }
 
@@ -316,7 +304,10 @@ static inline char *get_list_all_process_ids()
 {
 	pid_t *pid_list = (pid_t *)scan_all_digital_dir("/proc");
 	if (pid_list == NULL) {
-		return "ERROR: FILE_NOT_FOUND";
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+		return err_msg;
 	}
 	return convert_int_array_to_string((int *)pid_list);
 }
@@ -326,55 +317,71 @@ static inline char *get_thread_s_ids(const pid_t pid)
 	char *pid_task_path = NULL;
 	MALLOC(pid_task_path, sizeof(char) * PATH_SIZE);
 	snprintf(pid_task_path, PATH_SIZE, "/proc/%d/task", pid);
-	tid_t *tid_array = (pid_t *)scan_all_digital_dir(pid_task_path);
-	if (tid_array == NULL) {
-		return "ERROR: FILE_NOT_FOUND";
+	tid_t *tid_list = (pid_t *)scan_all_digital_dir(pid_task_path);
+	if (tid_list == NULL) {
+		char *err_msg = NULL;
+		CALLOC(err_msg, CMDLINE_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+		free(tid_list);
+		free(pid_task_path);
+		return err_msg;
 	}
 	free(pid_task_path);
-	return convert_int_array_to_string((int *)tid_array);
+	return convert_int_array_to_string((int *)tid_list);
 }
 
 static inline char *get_child_s_pids(const pid_t pid)
 {
 	pid_t *pid_list = (pid_t *)scan_all_digital_dir("/proc");
 	if (pid_list == NULL) {
-		return "ERROR: FILE_NOT_FOUND";
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+		return err_msg;
 	}
 	pid_t *children_list = NULL;
 	CALLOC(children_list, PROC_NUM, sizeof(pid_t));
-	char *tmp_child = NULL;
-	CALLOC(tmp_child, ID_WIDTH, sizeof(char));
+	char *target_ppid = NULL;
+	CALLOC(target_ppid, ID_WIDTH, sizeof(char));
+	snprintf(target_ppid, ID_WIDTH, "%d", pid);
 	int pid_count = 0, child_count = 0;
-	snprintf(tmp_child, ID_WIDTH, "%d", pid);
 	while (pid_list[pid_count] != -1) {
-		if (strcmp(tmp_child, get_status_file_field(pid_list[pid_count],
-		           "PPid")) == 0) {
+		char *tmp_ppid = get_status_file_field(pid_list[pid_count], "PPid");
+		if (strcmp(target_ppid, tmp_ppid) == 0) {
 			children_list[child_count++] = pid_list[pid_count];
 		}
+		free(tmp_ppid);
 		pid_count++;
 	}
 	children_list[child_count] = -1;
-	free(tmp_child);
+	free(target_ppid);
 	free(pid_list);
 	return convert_int_array_to_string(children_list);
 }
 
 static inline char *get_cmdline(const pid_t pid)
 {
-	FILE *fin;
-	if (!open_file(&fin, create_cmdline_path(pid))) {
-		return "ERROR: FILE_NOT_FOUND";
+	FILE *fin = NULL;
+	char *path = create_cmdline_path(pid);
+	if (!open_file(&fin, path)) {
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+		free(path);
+		return err_msg;
 	}
-	char *result = NULL;
-	CALLOC(result, CMDLINE_SIZE, sizeof(char));
 	char c;
 	int count = 0;
+	char *result = NULL;
+	CALLOC(result, CMDLINE_SIZE, sizeof(char));
 	while ((c = fgetc(fin)) != EOF) { //read all char until end of file
 		result[count++] = c;
 	}
 	fclose(fin);
+	free(path);
 	if (strlen(result) == 0) {
-		return "(nothing in the cmdline)";
+		strncpy(result, "(nothing in the cmdline)", CMDLINE_SIZE);
+		return result;
 	} else {
 		return result;
 	}
@@ -389,7 +396,12 @@ static inline char *get_all_ancients_of_pids(const pid_t pid)
 	int i = 0;
 	while (strcmp("0", tmp_ppid = get_status_file_field(tmp_pid, "PPid")) != 0) {
 		if (strcmp("ERROR: FILE_NOT_FOUND", tmp_ppid) == 0 ) {
-			return "ERROR: FILE_NOT_FOUND";
+			char *err_msg = NULL;
+			CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+			strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
+			free(tmp_ppid);
+			free(result);
+			return err_msg;
 		}
 		if (i > 0) {
 			strcat(result, " ");
