@@ -19,16 +19,16 @@ $(GIT_HOOKS):
 	@echo
 
 target:
-	$(CC) -o $(SERVER) $(CCFLAGS) $(OPTIMIZE) $(TARGET_SERVER) -lpthread
-	$(CC) -o $(CLIENT) $(CCFLAGS) $(OPTIMIZE) $(TARGET_CLIENT) -lpthread
+	$(CC) -o $(SERVER) $(CCFLAGS) $(OPTIMIZE) $(TARGET_SERVER) -pthread
+	$(CC) -o $(CLIENT) $(CCFLAGS) $(OPTIMIZE) $(TARGET_CLIENT) -pthread
 
 debug:
-	$(CC) -o $(SERVER) $(CCFLAGS) -g $(TARGET_SERVER)
-	$(CC) -o $(CLIENT) $(CCFLAGS) -g $(TARGET_CLIENT)
+	$(CC) -o $(SERVER) $(CCFLAGS) -g $(TARGET_SERVER) -pthread
+	$(CC) -o $(CLIENT) $(CCFLAGS) -g $(TARGET_CLIENT) -pthread
 
 prof:
-	$(CC) -o $(SERVER) $(CCFLAGS) -g -pg $(TARGET_SERVER)
-	$(CC) -o $(CLIENT) $(CCFLAGS) -g -pg $(TARGET_CLIENT)
+	$(CC) -o $(SERVER) $(CCFLAGS) -g -pg $(TARGET_SERVER) -pthread
+	$(CC) -o $(CLIENT) $(CCFLAGS) -g -pg $(TARGET_CLIENT) -pthread
 
 clean:
 	rm -rf $(SERVER)

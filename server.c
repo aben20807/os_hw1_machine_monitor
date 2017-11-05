@@ -198,7 +198,7 @@ void accept_client(const int sockfd)
 		                   (void *)&client_sockfd) < 0) {
 			perror("could not create thread");
 		}
-		printf("Handler assigned\n");
+		printf("Handler assigned to thread %li\n", thread_id);
 		fflush(stdout);
 	}
 }
