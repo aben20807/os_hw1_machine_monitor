@@ -64,9 +64,9 @@ static inline void delete_map(const map m)
 	while (curr_ptr != NULL) {
 		element_ptr tmp = curr_ptr;
 		curr_ptr = curr_ptr -> next;
-		free(tmp -> key);
-		free(tmp -> value);
-		free(tmp);
+		FREE(tmp -> key);
+		FREE(tmp -> value);
+		FREE(tmp);
 	}
 }
 
@@ -122,7 +122,7 @@ static inline int *scan_all_digital_dir(const char *path)
 		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
 		sprintf(err_msg, "opendir(%s)", path);
 		perror(err_msg);
-		free(err_msg);
+		FREE(err_msg);
 		return NULL;
 	}
 	struct dirent *entry;
@@ -157,7 +157,7 @@ static inline int create_server(const int port)
 	server_info.sin_addr.s_addr = INADDR_ANY;
 	server_info.sin_port = htons(port);
 	bind(sockfd, (struct sockaddr *)&server_info, sizeof(server_info));
-	listen(sockfd, 5);
+	listen(sockfd, MAX_LISTEN_NUM);
 	return sockfd;
 }
 
@@ -192,7 +192,7 @@ static void *connection_handler(void *client_sockfd)
 		strncpy(package.info, info, BUFSIZ);
 		send(sockfd, &package, sizeof(package), 0);
 		fflush(stdout);
-		free(info);
+		FREE(info);
 	}
 	if (read_size == 0) {
 		printf("Client disconnected\n");
@@ -213,10 +213,10 @@ static inline char *convert_int_array_to_string(int *int_array)
 		CALLOC(tmp_pid, ID_WIDTH, sizeof(char));
 		snprintf(tmp_pid, ID_WIDTH, (i == 0) ? "%d" : " %d", int_array[i]);
 		strcat(result, tmp_pid);
-		free(tmp_pid);
+		FREE(tmp_pid);
 		i++;
 	}
-	free(int_array);
+	FREE(int_array);
 	return result;
 }
 
@@ -228,7 +228,7 @@ static char *get_status_file_field(const pid_t pid, const char *field)
 		char *err_msg = NULL;
 		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
 		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
-		free(path);
+		FREE(path);
 		return err_msg;
 	}
 	char *result = NULL;
@@ -236,7 +236,7 @@ static char *get_status_file_field(const pid_t pid, const char *field)
 	map status_map = create_status_map(fin);
 	strncpy(result, search_value(status_map, field), VALUE_SIZE);
 	delete_map(status_map);
-	free(path);
+	FREE(path);
 	return result;
 }
 
@@ -322,11 +322,11 @@ static inline char *get_thread_s_ids(const pid_t pid)
 		char *err_msg = NULL;
 		CALLOC(err_msg, CMDLINE_SIZE, sizeof(char));
 		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
-		free(tid_list);
-		free(pid_task_path);
+		FREE(tid_list);
+		FREE(pid_task_path);
 		return err_msg;
 	}
-	free(pid_task_path);
+	FREE(pid_task_path);
 	return convert_int_array_to_string((int *)tid_list);
 }
 
@@ -350,12 +350,12 @@ static inline char *get_child_s_pids(const pid_t pid)
 		if (strcmp(target_ppid, tmp_ppid) == 0) {
 			children_list[child_count++] = pid_list[pid_count];
 		}
-		free(tmp_ppid);
+		FREE(tmp_ppid);
 		pid_count++;
 	}
 	children_list[child_count] = -1;
-	free(target_ppid);
-	free(pid_list);
+	FREE(target_ppid);
+	FREE(pid_list);
 	return convert_int_array_to_string(children_list);
 }
 
@@ -367,7 +367,7 @@ static inline char *get_cmdline(const pid_t pid)
 		char *err_msg = NULL;
 		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
 		strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
-		free(path);
+		FREE(path);
 		return err_msg;
 	}
 	char c;
@@ -378,7 +378,7 @@ static inline char *get_cmdline(const pid_t pid)
 		result[count++] = c;
 	}
 	fclose(fin);
-	free(path);
+	FREE(path);
 	if (strlen(result) == 0) {
 		strncpy(result, "(nothing in the cmdline)", CMDLINE_SIZE);
 		return result;
@@ -399,8 +399,8 @@ static inline char *get_all_ancients_of_pids(const pid_t pid)
 			char *err_msg = NULL;
 			CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
 			strncpy(err_msg, "ERROR: FILE_NOT_FOUND", ERRMSG_SIZE);
-			free(tmp_ppid);
-			free(result);
+			FREE(tmp_ppid);
+			FREE(result);
 			return err_msg;
 		}
 		if (i > 0) {
@@ -408,7 +408,7 @@ static inline char *get_all_ancients_of_pids(const pid_t pid)
 		}
 		strcat(result, tmp_ppid);
 		tmp_pid = atoi(tmp_ppid);
-		free(tmp_ppid);
+		FREE(tmp_ppid);
 		i++;
 	}
 	strcat(result, (strlen(result) == 0) ? "0" : " 0"); // add 0 ppid

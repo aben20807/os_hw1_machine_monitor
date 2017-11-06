@@ -3,6 +3,7 @@
 
 #include "protocol.h"
 
+#define MAX_LISTEN_NUM 50
 #define PATH_SIZE 40
 #define KEY_SIZE 30
 #define VALUE_SIZE 30
@@ -22,6 +23,9 @@
         fprintf(stderr, "insufficient memory"); \
         exit(EXIT_FAILURE); \
     }
+#define FREE(p) \
+    free(p); \
+    p = NULL; \
 
 
 typedef int tid_t;
