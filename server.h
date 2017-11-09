@@ -58,6 +58,6 @@ static inline char *get_list_all_process_ids();
 static inline char *get_thread_s_ids(const pid_t pid);
 static inline char *get_child_s_pids(const pid_t pid);
 static inline char *get_cmdline(const pid_t pid);
-static inline char *get_all_ancients_of_pids(const pid_t pid);
+static inline char *get_all_ancestors_of_pids(const pid_t pid);
 
 #endif

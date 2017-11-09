@@ -101,7 +101,7 @@ static inline void print_interface()
 	       "(e)state of process(D,R,S,T,t,W,X,Z)",
 	       "(f)command line of executing process(cmdline)",
 	       "(g)parent's PID",
-	       "(h)all ancients of PIDs",
+	       "(h)all ancestors of PIDs",
 	       "(i)virtual memory size(VmSize)",
 	       "(j)physical memory size(VmRSS)",
 	       "(k)exit"

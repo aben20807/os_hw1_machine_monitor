@@ -258,7 +258,7 @@ static inline char *get_process_info(const char command, const pid_t pid)
 	case 'g':
 		return get_status_file_field(pid, "PPid");
 	case 'h':
-		return get_all_ancients_of_pids(pid);
+		return get_all_ancestors_of_pids(pid);
 	case 'i':
 		return get_status_file_field(pid, "VmSize");
 	case 'j':
@@ -290,7 +290,7 @@ static inline char *get_process_description(const char command)
 	case 'g':
 		return "[parent's pid]";
 	case 'h':
-		return "[ancients' pids]";
+		return "[ancestors' pids]";
 	case 'i':
 		return "[virtual memory]";
 	case 'j':
@@ -387,7 +387,7 @@ static inline char *get_cmdline(const pid_t pid)
 	}
 }
 
-static inline char *get_all_ancients_of_pids(const pid_t pid)
+static inline char *get_all_ancestors_of_pids(const pid_t pid)
 {
 	pid_t tmp_pid = pid;
 	char *result = NULL;
